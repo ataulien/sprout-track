@@ -315,7 +315,7 @@ export default function MilestoneForm({
                   setFormData({ ...formData, title: e.target.value })
                 }
                 className="w-full"
-                placeholder="Enter milestone title (e.g., First Steps, First Word)"
+                placeholder={t('milestones.form.titlePlaceholder')}
                 required
                 disabled={loading}
               />

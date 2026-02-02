@@ -33,7 +33,14 @@ export default function BottleFeedForm({
   onDecrement,
 }: BottleFeedFormProps) {
   const { t } = useLocalization();
-  const bottleTypes = ['Formula', 'Breast Milk', 'Formula\\Breast', 'Milk', 'Other'];
+  const bottleTypes = [
+    { value: 'Formula', label: t('feeding.bottleType.formula') },
+    { value: 'Breast Milk', label: t('feeding.bottleType.breastMilk') },
+    { value: 'Formula\\Breast', label: t('feeding.bottleType.formulaBreast') },
+    { value: 'Milk', label: t('feeding.bottleType.milk') },
+    { value: 'Other', label: t('feeding.bottleType.other') },
+  ];
+  const unitLabel = unit === 'ML' ? t('units.ml') : t('units.oz');
   
   return (
     <div>
@@ -41,18 +48,18 @@ export default function BottleFeedForm({
       <div className="flex flex-wrap gap-2 mb-6">
         {bottleTypes.map((type) => (
           <Button
-            key={type}
+            key={type.value}
             type="button"
-            variant={bottleType === type ? 'default' : 'outline'}
+            variant={bottleType === type.value ? 'default' : 'outline'}
             className="flex-1 min-w-[100px]"
-            onClick={() => onBottleTypeChange(type)}
+            onClick={() => onBottleTypeChange(type.value)}
             disabled={loading}
           >
-            {type.replace('\\', '/')}
+            {type.label}
           </Button>
         ))}
       </div>
-      <label className="form-label mb-6">{t('Amount (')}{unit === 'ML' ? 'ml' : 'oz'})</label>
+      <label className="form-label mb-6">{t('feeding.form.amountLabel')} ({unitLabel})</label>
       <div className="flex items-center justify-center mb-6">
         <Button
           type="button"
@@ -69,7 +76,7 @@ export default function BottleFeedForm({
           value={amount}
           onChange={(e) => onAmountChange(e.target.value)}
           className="w-24 mx-3 text-center"
-          placeholder="Amount"
+          placeholder={t('feeding.form.amountPlaceholder')}
           inputMode="decimal"
           disabled={loading}
         />
@@ -92,7 +99,7 @@ export default function BottleFeedForm({
           onClick={() => onUnitChange('OZ')}
           disabled={loading}
         >
-          oz
+          {t('units.oz')}
         </Button>
         <Button
           type="button"
@@ -101,7 +108,7 @@ export default function BottleFeedForm({
           onClick={() => onUnitChange('ML')}
           disabled={loading}
         >
-          ml
+          {t('units.ml')}
         </Button>
       </div>
       <div className="mt-6">
