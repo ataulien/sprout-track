@@ -33,11 +33,11 @@ export default function SolidsFeedForm({
   onDecrement,
 }: SolidsFeedFormProps) {
   const { t } = useLocalization();
-  const unitLabel = unit === 'TBSP' ? t('units.tbsp') : t('units.g');
+  const unitLabel = unit === 'TBSP' ? t('tbsp') : t('g');
   return (
     <>
       <div>
-        <label className="form-label mb-6">{t('feeding.form.amountLabel')} ({unitLabel})</label>
+        <label className="form-label mb-6">{t('Amount')} ({unitLabel})</label>
         <div className="flex items-center justify-center mb-6">
           <Button
             type="button"
@@ -54,7 +54,7 @@ export default function SolidsFeedForm({
             value={amount}
             onChange={(e) => onAmountChange(e.target.value)}
             className="w-24 mx-3 text-center"
-            placeholder={t('feeding.form.amountPlaceholder')}
+            placeholder={t('Amount')}
             inputMode="decimal"
             disabled={loading}
           />
@@ -77,7 +77,7 @@ export default function SolidsFeedForm({
             onClick={() => onUnitChange('TBSP')}
             disabled={loading}
           >
-            {t('units.tbsp')}
+            {t('tbsp')}
           </Button>
           <Button
             type="button"
@@ -86,7 +86,7 @@ export default function SolidsFeedForm({
             onClick={() => onUnitChange('G')}
             disabled={loading}
           >
-            {t('units.g')}
+            {t('g')}
           </Button>
         </div>
       </div>

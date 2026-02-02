@@ -565,7 +565,7 @@ export default function AppConfigForm({
                                 onClick={handleNewPassword}
                                 disabled={!newPassword.trim()}
                               >
-                                {t('actions.continue')}
+                                {t('Continue')}
                               </Button>
                             </div>
                             <p className="text-xs text-gray-500">
@@ -589,7 +589,7 @@ export default function AppConfigForm({
                                   setError(null);
                                   setSuccess(null);
                                 }}
-                                placeholder={t('admin.password.confirm.placeholder')}
+                                placeholder={t('Confirm new password')}
                                 autoComplete="new-password"
                               />
                               <Button 
@@ -629,7 +629,7 @@ export default function AppConfigForm({
                       name="rootDomain"
                       value={formData.rootDomain}
                       onChange={handleInputChange}
-                      placeholder={t('admin.rootDomain.placeholder')}
+                      placeholder={t('example.com')}
                       required
                     />
                     <p className="text-xs text-gray-500">
@@ -740,7 +740,7 @@ export default function AppConfigForm({
                         name="smtp2goApiKey"
                         value={emailFormData.smtp2goApiKey}
                         onChange={handleEmailInputChange}
-                        placeholder={t('admin.smtp2go.placeholder')}
+                        placeholder={t('Enter SMTP2GO API Key')}
                       />
                     </div>
                   )}

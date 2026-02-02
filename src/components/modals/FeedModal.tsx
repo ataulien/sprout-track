@@ -197,10 +197,10 @@ export default function FeedModal({
       <DialogContent className="dialog-content !p-4 sm:!p-6">
         <DialogHeader className="dialog-header">
           <DialogTitle className="dialog-title">
-            {activity ? t('feeding.modal.title.edit') : t('feeding.modal.title.new')}
+            {activity ? t('Edit Feeding') : t('Log Feeding')}
           </DialogTitle>
           <DialogDescription className="dialog-description">
-            {activity ? t('feeding.modal.description.edit') : t('feeding.modal.description.new')}
+            {activity ? t('Update what and when your baby ate') : t('Record what and when your baby ate')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -219,7 +219,7 @@ export default function FeedModal({
               />
             </div>
             <div>
-              <label className="form-label">{t('feeding.form.typeLabel')}</label>
+              <label className="form-label">{t('Type')}</label>
               <Select
                 value={formData.type}
                 onValueChange={(value: FeedType) =>
@@ -227,7 +227,7 @@ export default function FeedModal({
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder={t('feeding.form.typePlaceholder')} />
+                  <SelectValue placeholder={t('Select type')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="BREAST">{t('Breast')}</SelectItem>

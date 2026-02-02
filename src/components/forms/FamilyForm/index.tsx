@@ -850,7 +850,7 @@ export default function FamilyForm({
                           setSystemPin(value);
                         }
                       }}
-                      placeholder={t('placeholders.pin.enter')}
+                      placeholder={t('Enter PIN')}
                       disabled={loading}
                       minLength={6}
                       maxLength={10}
@@ -867,7 +867,7 @@ export default function FamilyForm({
                           setConfirmSystemPin(value);
                         }
                       }}
-                      placeholder={t('placeholders.pin.confirm')}
+                      placeholder={t('Confirm PIN')}
                       disabled={loading}
                       minLength={6}
                       maxLength={10}
@@ -1081,7 +1081,7 @@ export default function FamilyForm({
                     pattern="[0-9]{2}:[0-9]{2}"
                     value={feedWarningTime}
                     onChange={(e) => setFeedWarningTime(e.target.value)}
-                    placeholder={t('placeholders.feedWarningTime.family')}
+                    placeholder={t('02:00')}
                     disabled={loading}
                   />
                   <p className="text-xs text-gray-500 family-form-text-muted mt-1">{t('Format: hh:mm')}</p>
@@ -1093,7 +1093,7 @@ export default function FamilyForm({
                     pattern="[0-9]{2}:[0-9]{2}"
                     value={diaperWarningTime}
                     onChange={(e) => setDiaperWarningTime(e.target.value)}
-                    placeholder={t('placeholders.diaperWarningTime.family')}
+                    placeholder={t('03:00')}
                     disabled={loading}
                   />
                   <p className="text-xs text-gray-500 family-form-text-muted mt-1">{t('Format: hh:mm')}</p>

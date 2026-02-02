@@ -227,7 +227,7 @@ export default function BabyForm({
                   setFormData({ ...formData, feedWarningTime: e.target.value })
                 }
                 className="w-full"
-                placeholder={t('placeholders.feedWarningTime.baby')}
+                placeholder={t('03:00')}
                 required
               />
             </div>
@@ -241,7 +241,7 @@ export default function BabyForm({
                   setFormData({ ...formData, diaperWarningTime: e.target.value })
                 }
                 className="w-full"
-                placeholder={t('placeholders.diaperWarningTime.baby')}
+                placeholder={t('02:00')}
                 required
               />
             </div>
