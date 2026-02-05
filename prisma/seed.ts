@@ -8,7 +8,106 @@ type UnitData = {
   activityTypes?: string;
 };
 
+type SeedLocale = 'en' | 'fr';
+
+type SeedStrings = {
+  defaultFamilyName: string;
+  defaultFamilySlug: string;
+  systemCaretakerName: string;
+  systemCaretakerType: string;
+  unitNames: Record<string, string>;
+};
+
+const EN_UNIT_NAMES: Record<string, string> = {
+  OZ: 'Ounces',
+  ML: 'Milliliters',
+  TBSP: 'Tablespoon',
+  LB: 'Pounds',
+  IN: 'Inches',
+  CM: 'Centimeters',
+  G: 'Grams',
+  KG: 'Kilograms',
+  F: 'Fahrenheit',
+  C: 'Celsius',
+  MG: 'Milligrams',
+  MCG: 'Micrograms',
+  L: 'Liters',
+  CC: 'Cubic Centimeters',
+  MOL: 'Moles',
+  MMOL: 'Millimoles',
+  DROP: 'Drops',
+  DOSE: 'Dose',
+  PILL: 'Pill',
+  CAP: 'Cap',
+  TAB: 'Tab',
+  SPRAY: 'Spray',
+  INHALER: 'Inhaler',
+  INJECTION: 'Injection',
+  PATCH: 'Patch',
+  CREAM: 'Cream',
+  OINTMENT: 'Ointment',
+  SUPPOSITORY: 'Suppository'
+};
+
+const FR_UNIT_NAMES: Record<string, string> = {
+  OZ: 'Onces',
+  ML: 'Millilitres',
+  TBSP: 'Cuillère à soupe',
+  LB: 'Livres',
+  IN: 'Pouces',
+  CM: 'Centimètres',
+  G: 'Grammes',
+  KG: 'Kilogrammes',
+  F: 'Fahrenheit',
+  C: 'Celsius',
+  MG: 'Milligrammes',
+  MCG: 'Microgrammes',
+  L: 'Litres',
+  CC: 'Centimètres cubes',
+  MOL: 'Moles',
+  MMOL: 'Millimoles',
+  DROP: 'Gouttes',
+  DOSE: 'Dose',
+  PILL: 'Pilule',
+  CAP: 'Gélule',
+  TAB: 'Comprimé',
+  SPRAY: 'Spray',
+  INHALER: 'Inhalateur',
+  INJECTION: 'Injection',
+  PATCH: 'Patch',
+  CREAM: 'Crème',
+  OINTMENT: 'Pommade',
+  SUPPOSITORY: 'Suppositoire'
+};
+
+function getSeedLocale(): SeedLocale {
+  const raw = process.env.SEED_LANGUAGE || process.env.SEED_LOCALE || 'en';
+  return raw.toLowerCase() === 'fr' ? 'fr' : 'en';
+}
+
+function getSeedStrings(locale: SeedLocale): SeedStrings {
+  if (locale === 'fr') {
+    return {
+      defaultFamilyName: 'Ma famille',
+      defaultFamilySlug: 'ma-famille',
+      systemCaretakerName: 'Système',
+      systemCaretakerType: 'Administrateur système',
+      unitNames: FR_UNIT_NAMES
+    };
+  }
+  return {
+    defaultFamilyName: 'My Family',
+    defaultFamilySlug: 'my-family',
+    systemCaretakerName: 'system',
+    systemCaretakerType: 'System Administrator',
+    unitNames: EN_UNIT_NAMES
+  };
+}
+
 async function main() {
+  const seedLocale = getSeedLocale();
+  const seedStrings = getSeedStrings(seedLocale);
+
   // Check if any families exist - if not, create the initial family and system caretaker
   const familyCount = await prisma.family.count();
   let defaultFamilyId: string;
@@ -19,8 +118,8 @@ async function main() {
     // Create the default family
     const defaultFamily = await prisma.family.create({
       data: {
-        name: "My Family",
-        slug: "my-family",
+        name: seedStrings.defaultFamilyName,
+        slug: seedStrings.defaultFamilySlug,
         isActive: true
       }
     });
@@ -32,10 +131,11 @@ async function main() {
     const systemCaretaker = await prisma.caretaker.create({
       data: {
         loginId: '00',
-        name: 'system',
-        type: 'System Administrator',
+        name: seedStrings.systemCaretakerName,
+        type: seedStrings.systemCaretakerType,
         role: 'ADMIN',
         securityPin: '111222', // Default PIN
+        language: seedLocale,
         familyId: defaultFamilyId,
         inactive: false,
         deletedAt: null
@@ -57,7 +157,7 @@ async function main() {
     await prisma.settings.create({
       data: {
         familyId: defaultFamilyId,
-        familyName: "My Family",
+        familyName: seedStrings.defaultFamilyName,
         securityPin: "111222",
         // authType will be auto-detected based on caretaker existence
         defaultBottleUnit: "OZ",
@@ -75,34 +175,34 @@ async function main() {
 
   // Define all available units with their activity types
   const unitData: UnitData[] = [
-    { unitAbbr: 'OZ', unitName: 'Ounces', activityTypes: 'weight,feed,medicine' },
-    { unitAbbr: 'ML', unitName: 'Milliliters', activityTypes: 'medicine,feed' },
-    { unitAbbr: 'TBSP', unitName: 'Tablespoon', activityTypes: 'medicine,feed' },
-    { unitAbbr: 'LB', unitName: 'Pounds', activityTypes: 'weight' },
-    { unitAbbr: 'IN', unitName: 'Inches', activityTypes: 'height' },
-    { unitAbbr: 'CM', unitName: 'Centimeters', activityTypes: 'height' },
-    { unitAbbr: 'G', unitName: 'Grams', activityTypes: 'weight,feed,medicine' },
-    { unitAbbr: 'KG', unitName: 'Kilograms', activityTypes: 'weight' },
-    { unitAbbr: 'F', unitName: 'Fahrenheit', activityTypes: 'temp' },
-    { unitAbbr: 'C', unitName: 'Celsius', activityTypes: 'temp' },
-    { unitAbbr: 'MG', unitName: 'Milligrams', activityTypes: 'medicine' },
-    { unitAbbr: 'MCG', unitName: 'Micrograms', activityTypes: 'medicine' },
-    { unitAbbr: 'L', unitName: 'Liters', activityTypes: 'medicine' },
-    { unitAbbr: 'CC', unitName: 'Cubic Centimeters', activityTypes: 'medicine' },
-    { unitAbbr: 'MOL', unitName: 'Moles', activityTypes: 'medicine' },
-    { unitAbbr: 'MMOL', unitName: 'Millimoles', activityTypes: 'medicine' },
-    { unitAbbr: 'DROP', unitName: 'Drops', activityTypes: 'medicine' },
-    { unitAbbr: 'DOSE', unitName: 'Dose', activityTypes: 'medicine' },
-    { unitAbbr: 'PILL', unitName: 'Pill', activityTypes: 'medicine' },
-    { unitAbbr: 'CAP', unitName: 'Cap', activityTypes: 'medicine' },
-    { unitAbbr: 'TAB', unitName: 'Tab', activityTypes: 'medicine' },
-    { unitAbbr: 'SPRAY', unitName: 'Spray', activityTypes: 'medicine' },
-    { unitAbbr: 'INHALER', unitName: 'Inhaler', activityTypes: 'medicine' },
-    { unitAbbr: 'INJECTION', unitName: 'Injection', activityTypes: 'medicine' },
-    { unitAbbr: 'PATCH', unitName: 'Patch', activityTypes: 'medicine' },
-    { unitAbbr: 'CREAM', unitName: 'Cream', activityTypes: 'medicine' },
-    { unitAbbr: 'OINTMENT', unitName: 'Ointment', activityTypes: 'medicine' },
-    { unitAbbr: 'SUPPOSITORY', unitName: 'Suppository', activityTypes: 'medicine' },
+    { unitAbbr: 'OZ', unitName: seedStrings.unitNames.OZ, activityTypes: 'weight,feed,medicine' },
+    { unitAbbr: 'ML', unitName: seedStrings.unitNames.ML, activityTypes: 'medicine,feed' },
+    { unitAbbr: 'TBSP', unitName: seedStrings.unitNames.TBSP, activityTypes: 'medicine,feed' },
+    { unitAbbr: 'LB', unitName: seedStrings.unitNames.LB, activityTypes: 'weight' },
+    { unitAbbr: 'IN', unitName: seedStrings.unitNames.IN, activityTypes: 'height' },
+    { unitAbbr: 'CM', unitName: seedStrings.unitNames.CM, activityTypes: 'height' },
+    { unitAbbr: 'G', unitName: seedStrings.unitNames.G, activityTypes: 'weight,feed,medicine' },
+    { unitAbbr: 'KG', unitName: seedStrings.unitNames.KG, activityTypes: 'weight' },
+    { unitAbbr: 'F', unitName: seedStrings.unitNames.F, activityTypes: 'temp' },
+    { unitAbbr: 'C', unitName: seedStrings.unitNames.C, activityTypes: 'temp' },
+    { unitAbbr: 'MG', unitName: seedStrings.unitNames.MG, activityTypes: 'medicine' },
+    { unitAbbr: 'MCG', unitName: seedStrings.unitNames.MCG, activityTypes: 'medicine' },
+    { unitAbbr: 'L', unitName: seedStrings.unitNames.L, activityTypes: 'medicine' },
+    { unitAbbr: 'CC', unitName: seedStrings.unitNames.CC, activityTypes: 'medicine' },
+    { unitAbbr: 'MOL', unitName: seedStrings.unitNames.MOL, activityTypes: 'medicine' },
+    { unitAbbr: 'MMOL', unitName: seedStrings.unitNames.MMOL, activityTypes: 'medicine' },
+    { unitAbbr: 'DROP', unitName: seedStrings.unitNames.DROP, activityTypes: 'medicine' },
+    { unitAbbr: 'DOSE', unitName: seedStrings.unitNames.DOSE, activityTypes: 'medicine' },
+    { unitAbbr: 'PILL', unitName: seedStrings.unitNames.PILL, activityTypes: 'medicine' },
+    { unitAbbr: 'CAP', unitName: seedStrings.unitNames.CAP, activityTypes: 'medicine' },
+    { unitAbbr: 'TAB', unitName: seedStrings.unitNames.TAB, activityTypes: 'medicine' },
+    { unitAbbr: 'SPRAY', unitName: seedStrings.unitNames.SPRAY, activityTypes: 'medicine' },
+    { unitAbbr: 'INHALER', unitName: seedStrings.unitNames.INHALER, activityTypes: 'medicine' },
+    { unitAbbr: 'INJECTION', unitName: seedStrings.unitNames.INJECTION, activityTypes: 'medicine' },
+    { unitAbbr: 'PATCH', unitName: seedStrings.unitNames.PATCH, activityTypes: 'medicine' },
+    { unitAbbr: 'CREAM', unitName: seedStrings.unitNames.CREAM, activityTypes: 'medicine' },
+    { unitAbbr: 'OINTMENT', unitName: seedStrings.unitNames.OINTMENT, activityTypes: 'medicine' },
+    { unitAbbr: 'SUPPOSITORY', unitName: seedStrings.unitNames.SUPPOSITORY, activityTypes: 'medicine' },
   ];
 
   // Handle units separately
@@ -124,12 +224,15 @@ async function updateUnits(unitData: UnitData[]): Promise<void> {
   
   // Get existing units from the database
   const existingUnits = await prisma.unit.findMany({
-    select: { id: true, unitAbbr: true, activityTypes: true }
+    select: { id: true, unitAbbr: true, activityTypes: true, unitName: true }
   });
   
   // Create a map of existing unit abbreviations for faster lookups
   const existingUnitsMap = new Map(
-    existingUnits.map(unit => [unit.unitAbbr, { id: unit.id, activityTypes: unit.activityTypes }])
+    existingUnits.map(unit => [
+      unit.unitAbbr,
+      { id: unit.id, activityTypes: unit.activityTypes, unitName: unit.unitName }
+    ])
   );
   
   // Filter out units that already exist
@@ -158,7 +261,8 @@ async function updateUnits(unitData: UnitData[]): Promise<void> {
       unitsToUpdate.push({
         id: existingUnit.id,
         unitAbbr: unit.unitAbbr,
-        activityTypes: unit.activityTypes
+        activityTypes: unit.activityTypes,
+        unitName: unit.unitName
       });
     }
   }
@@ -170,7 +274,7 @@ async function updateUnits(unitData: UnitData[]): Promise<void> {
       console.log(`Setting ${unit.unitAbbr} activity types to: ${unit.activityTypes}`);
       await prisma.unit.update({
         where: { id: unit.id },
-        data: { activityTypes: unit.activityTypes }
+        data: { activityTypes: unit.activityTypes, unitName: unit.unitName }
       });
     }
   } else {
