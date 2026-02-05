@@ -211,7 +211,7 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
 
     const { formatDate, formatDateOnly } = useTimezone();
     // Function to format date for display
-    const formatDate = (date: Date | null | undefined) => {
+    const formatDateLabel = (date: Date | null | undefined) => {
       if (!date) return '';
       return formatDateOnly(date.toISOString());
     };
@@ -438,12 +438,12 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
           <div className="calendar-range-display px-3 pt-2 pb-4 text-sm text-gray-700 flex justify-between items-center">
             <div className="flex flex-col">
               <span className="text-xs text-gray-500 font-medium">{t('From')}</span>
-              <span className="font-semibold">{formatDate(rangeFrom) || '—'}</span>
+              <span className="font-semibold">{formatDateLabel(rangeFrom) || '—'}</span>
             </div>
             <div className="h-px w-4 bg-gray-300 mx-2"></div>
             <div className="flex flex-col">
               <span className="text-xs text-gray-500 font-medium">{t('To')}</span>
-              <span className="font-semibold">{formatDate(rangeTo) || '—'}</span>
+              <span className="font-semibold">{formatDateLabel(rangeTo) || '—'}</span>
             </div>
           </div>
         )}
