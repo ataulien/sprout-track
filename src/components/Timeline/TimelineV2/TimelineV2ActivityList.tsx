@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/src/context/theme';
 import { Label } from '@/src/components/ui/label';
 import { useLocalization } from '@/src/context/localization';
+import { formatDate, formatTime as formatTimeDisplay, getDateTimePreferences } from '@/src/lib/date-time';
 
 import '../timeline-activity-list.css';
 
@@ -20,6 +21,15 @@ const TimelineV2ActivityList = ({
   
 
   const { t } = useLocalization();  
+
+  const dateTimePreferences = useMemo(
+    () =>
+      getDateTimePreferences({
+        timeFormat: settings?.timeFormat as '24h' | '12h' | undefined,
+        dateFormat: settings?.dateFormat as 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD' | undefined,
+      }),
+    [settings]
+  );
 
   const { theme } = useTheme();
   
@@ -161,47 +171,23 @@ const TimelineV2ActivityList = ({
                               const endTime = new Date(activity.endTime);
                               const endDateStr = endTime.toDateString();
                               const isOvernight = startDateStr !== endDateStr;
-                              
-                              const startTimeStr = startTime.toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true,
-                              });
-                              
-                              const endTimeStr = endTime.toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true,
-                              });
+                              const startTimeStr = formatTimeDisplay(startTime, dateTimePreferences);
+                              const endTimeStr = formatTimeDisplay(endTime, dateTimePreferences);
                               
                               if (isOvernight) {
                                 // Show dates for overnight entries
-                                const startDateFormatted = startTime.toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                });
-                                const endDateFormatted = endTime.toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                });
+                                const startDateFormatted = formatDate(startTime, dateTimePreferences);
+                                const endDateFormatted = formatDate(endTime, dateTimePreferences);
                                 timeStr = `${startDateFormatted} ${startTimeStr} - ${endDateFormatted} ${endTimeStr}`;
                               } else {
                                 timeStr = `${startTimeStr} - ${endTimeStr}`;
                               }
                             } else {
-                              const startTimeStr = startTime.toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true,
-                              });
+                              const startTimeStr = formatTimeDisplay(startTime, dateTimePreferences);
                               timeStr = startTimeStr;
                             }
                           } else {
-                            timeStr = activityTime.toLocaleTimeString('en-US', {
-                              hour: 'numeric',
-                              minute: '2-digit',
-                              hour12: true,
-                            });
+                            timeStr = formatTimeDisplay(activityTime, dateTimePreferences);
                           }
                           
                           const getActivityColor = (bgClass: string) => {

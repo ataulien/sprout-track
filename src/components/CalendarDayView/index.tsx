@@ -16,6 +16,7 @@ import { CalendarEventFormData } from '@/src/components/forms/CalendarEventForm/
 import { useToast } from '@/src/components/ui/toast';
 import { handleExpirationError } from '@/src/lib/expiration-error-handler';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 import './calendar-day-view.css';
 
@@ -44,6 +45,7 @@ export const CalendarDayView: React.FC<CalendarDayViewProps> = ({
 }) => {
   const { showToast } = useToast();
   const { t } = useLocalization();
+  const { formatDateOnly } = useTimezone();
   
   // State for event form
   const [showEventForm, setShowEventForm] = useState(false);
@@ -91,13 +93,8 @@ export const CalendarDayView: React.FC<CalendarDayViewProps> = ({
   
   // Format date for display
   const formattedDate = useMemo(() => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  }, [date]);
+    return formatDateOnly(date.toISOString());
+  }, [date, formatDateOnly]);
   
   // Group events by time of day
   const groupedEvents = useMemo(() => {

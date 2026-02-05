@@ -19,6 +19,7 @@ import {
   ActivityDescription, 
   ActivityStyle 
 } from './types';
+import { formatDate, formatTime as formatTimeDisplay, getDateTimePreferences } from '@/src/lib/date-time';
 
 export const getActivityIcon = (activity: ActivityType) => {
   if ('doseAmount' in activity && 'medicineId' in activity) {
@@ -93,11 +94,11 @@ export const formatTime = (date: string, settings: Settings | null, includeDate:
     const dateObj = new Date(date);
     if (isNaN(dateObj.getTime())) return 'Invalid Date';
 
-    const timeStr = dateObj.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
+    const preferences = getDateTimePreferences({
+      timeFormat: settings?.timeFormat as '24h' | '12h' | undefined,
+      dateFormat: settings?.dateFormat as 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD' | undefined,
     });
+    const timeStr = formatTimeDisplay(dateObj, preferences);
 
     if (!includeDate) return timeStr;
 
@@ -108,14 +109,11 @@ export const formatTime = (date: string, settings: Settings | null, includeDate:
     const isToday = dateObj.toDateString() === today.toDateString();
     const isYesterday = dateObj.toDateString() === yesterday.toDateString();
 
-    const dateStr = isToday 
+    const dateStr = isToday
       ? 'Today'
-      : isYesterday 
+      : isYesterday
       ? 'Yesterday'
-      : dateObj.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-        }).replace(/(\d+)$/, '$1,');
+      : formatDate(dateObj, preferences);
     return `${dateStr} ${timeStr}`;
   } catch (error) {
     console.error('Error formatting time:', error);

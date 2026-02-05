@@ -460,6 +460,8 @@ model Settings {
   defaultHeightUnit   String   @default("IN") // Default unit for height measurement
   defaultWeightUnit   String   @default("LB") // Default unit for weight measurement
   defaultTempUnit     String   @default("F") // Default unit for temperature
+  timeFormat          String   @default("24h") // "24h" or "12h"
+  dateFormat          String   @default("DD/MM/YYYY") // "DD/MM/YYYY", "MM/DD/YYYY", or "YYYY-MM-DD"
   activitySettings    String? // JSON string for activity order and visibility settings
   enableDebugTimer    Boolean  @default(false) // Enable debug session timer
   enableDebugTimezone Boolean  @default(false) // Enable debug timezone tool

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/src/components/ui/dialog';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 import './account-manager.css';
 
@@ -50,6 +51,7 @@ interface PaymentHistoryProps {
  */
 const PaymentHistory: React.FC<PaymentHistoryProps> = ({ isOpen, onClose }) => {
   const { t } = useLocalization();
+  const { formatDateOnly } = useTimezone();
   
   // State management
   const [transactions, setTransactions] = useState<PaymentTransaction[]>([]);
@@ -121,12 +123,7 @@ const PaymentHistory: React.FC<PaymentHistoryProps> = ({ isOpen, onClose }) => {
    * Format transaction date for display
    */
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+    return formatDateOnly(dateString);
   };
 
   /**

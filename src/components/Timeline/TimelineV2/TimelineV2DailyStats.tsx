@@ -28,6 +28,7 @@ import { FilterType } from '../types';
 import { ActivityType } from '../types';
 import TimelineV2Heatmap from './TimelineV2Heatmap';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 import './TimelineV2DailyStats.css';
 
@@ -68,6 +69,7 @@ const TimelineV2DailyStats: React.FC<TimelineV2DailyStatsProps> = ({
   onHeatmapToggle
 }) => {
   const { t } = useLocalization();
+  const { formatDateOnly } = useTimezone();
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -525,13 +527,7 @@ const TimelineV2DailyStats: React.FC<TimelineV2DailyStatsProps> = ({
     return tiles;
   }, [activities, date, t]);
 
-  const formatDate = (date: Date): string => {
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
+  const formatDate = (date: Date): string => formatDateOnly(date.toISOString());
 
   return (
     <div className="overflow-hidden border-0 bg-white timeline-v2-daily-stats relative z-10">

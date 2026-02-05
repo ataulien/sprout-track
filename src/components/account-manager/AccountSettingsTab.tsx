@@ -8,6 +8,7 @@ import { Label } from '@/src/components/ui/label';
 import PaymentModal from './PaymentModal';
 import PaymentHistory from './PaymentHistory';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 import {
   User,
@@ -41,6 +42,7 @@ const AccountSettingsTab: React.FC<AccountSettingsTabProps> = ({
 }) => {
 
   const { t } = useLocalization();
+  const { formatDateOnly } = useTimezone();
   // Edit states
   const [editingAccount, setEditingAccount] = useState(false);
   const [editingFamily, setEditingFamily] = useState(false);
@@ -916,7 +918,7 @@ const AccountSettingsTab: React.FC<AccountSettingsTabProps> = ({
                     </p>
                     {accountStatus.trialEnds && (
                       <p className="text-sm text-blue-600 mb-3">
-                        {t('You have a trial that expires on')} {new Date(accountStatus.trialEnds).toLocaleDateString()}.
+                        {t('You have a trial that expires on')} {formatDateOnly(new Date(accountStatus.trialEnds).toISOString())}.
                       </p>
                     )}
                   </div>
@@ -980,7 +982,7 @@ const AccountSettingsTab: React.FC<AccountSettingsTabProps> = ({
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-gray-500" />
                     <Label className="text-sm">
-                      {t('Trial ends')} {new Date(accountStatus.trialEnds).toLocaleDateString()}
+                      {t('Trial ends')} {formatDateOnly(new Date(accountStatus.trialEnds).toISOString())}
                     </Label>
                   </div>
                   <Button
@@ -998,7 +1000,7 @@ const AccountSettingsTab: React.FC<AccountSettingsTabProps> = ({
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-gray-500" />
                   <Label className="text-sm">
-                    {t('Subscription ends')} {new Date(accountStatus.planExpires).toLocaleDateString()}
+                    {t('Subscription ends')} {formatDateOnly(new Date(accountStatus.planExpires).toISOString())}
                   </Label>
                 </div>
               )}

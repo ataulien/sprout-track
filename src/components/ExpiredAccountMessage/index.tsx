@@ -5,6 +5,7 @@ import { Button } from '@/src/components/ui/button';
 import { AlertTriangle, Crown } from 'lucide-react';
 import Image from 'next/image';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 import './expired-account.css';
 
@@ -22,6 +23,7 @@ export default function ExpiredAccountMessage({
   expirationDate
 }: ExpiredAccountMessageProps) {
   const { t } = useLocalization();
+  const { formatDateOnly } = useTimezone();
 
   const handleUpgradeClick = () => {
     // Navigate to home page with login modal
@@ -74,7 +76,7 @@ export default function ExpiredAccountMessage({
               : 'Your subscription expired'
             }
             {expirationDate && (
-              <span> on {new Date(expirationDate).toLocaleDateString()}</span>
+              <span> on {formatDateOnly(new Date(expirationDate).toISOString())}</span>
             )}
           </p>
         </div>

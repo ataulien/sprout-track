@@ -14,6 +14,7 @@ import { useBaby } from '@/app/context/baby';
 import { styles } from './reports.styles';
 import { MilestonesTabProps, MilestoneActivity } from './reports.types';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 interface MilestonesByAge {
   ageInMonths: number;
@@ -29,6 +30,7 @@ interface MilestonesByAge {
  */
 const MilestonesTab: React.FC<MilestonesTabProps> = () => {
   const { t } = useLocalization();
+  const { formatDateOnly } = useTimezone();
   const { selectedBaby } = useBaby();
   const [milestones, setMilestones] = useState<MilestoneActivity[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -140,12 +142,7 @@ const MilestonesTab: React.FC<MilestonesTabProps> = () => {
 
   // Format date for display
   const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    return formatDateOnly(dateString);
   };
 
   // Get default open accordion values (all months)

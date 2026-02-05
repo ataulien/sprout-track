@@ -31,6 +31,7 @@ import { useToast } from '@/src/components/ui/toast';
 import { handleExpirationError } from '@/src/lib/expiration-error-handler';
 import { useLocalization } from '@/src/context/localization';
 import NotificationSettings from './NotificationSettings';
+import { getDefaultDateFormat } from '@/src/lib/date-time';
 
 interface FamilyData {
   id: string;
@@ -58,7 +59,7 @@ export default function SettingsForm({
   selectedBabyId,
   familyId,
 }: SettingsFormProps) {
-  const { t } = useLocalization();
+  const { t, language } = useLocalization();
   const router = useRouter();
   const { showToast } = useToast();
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -89,6 +90,16 @@ export default function SettingsForm({
 
   // Local authType state for immediate UI feedback
   const [localAuthType, setLocalAuthType] = useState<'SYSTEM' | 'CARETAKER'>('SYSTEM');
+  const defaultDateFormat = getDefaultDateFormat(language);
+  const timeFormatOptions = [
+    { value: '24h', label: t('24-hour') },
+    { value: '12h', label: t('12-hour (AM/PM)') },
+  ];
+  const dateFormatOptions = [
+    { value: 'DD/MM/YYYY', label: t('DD/MM/YYYY') },
+    { value: 'MM/DD/YYYY', label: t('MM/DD/YYYY') },
+    { value: 'YYYY-MM-DD', label: t('YYYY-MM-DD') },
+  ];
 
   useEffect(() => {
     // Only set the selected baby ID if explicitly provided
@@ -316,6 +327,14 @@ export default function SettingsForm({
       const data = await response.json();
       if (data.success) {
         setSettings(data.data);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('settingsUpdated', {
+            detail: {
+              timeFormat: data.data.timeFormat,
+              dateFormat: data.data.dateFormat,
+            }
+          }));
+        }
       } else {
         showToast({
           variant: 'error',
@@ -824,6 +843,53 @@ export default function SettingsForm({
                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-slate-200 pt-6">
+              <h3 className="form-label mb-4">{t('Date & Time')}</h3>
+              <div className="space-y-4">
+                <div>
+                  <Label className="form-label">{t('Time Format')}</Label>
+                  <p className="text-sm text-gray-500">{t('Choose how times are displayed')}</p>
+                  <Select
+                    value={settings?.timeFormat || '24h'}
+                    onValueChange={(value) => handleSettingsChange({ timeFormat: value as Settings['timeFormat'] })}
+                    disabled={loading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('Select time format')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {timeFormatOptions.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="form-label">{t('Date Format')}</Label>
+                  <p className="text-sm text-gray-500">{t('Choose how dates are displayed')}</p>
+                  <Select
+                    value={settings?.dateFormat || defaultDateFormat}
+                    onValueChange={(value) => handleSettingsChange({ dateFormat: value as Settings['dateFormat'] })}
+                    disabled={loading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('Select date format')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {dateFormatOptions.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>

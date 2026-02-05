@@ -1,6 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo } from 'react';
+import { useLocalization } from '@/src/context/localization';
+import {
+  DateTimePreferences,
+  getDateTimePreferences,
+  formatDate as formatDateWithPreferences,
+  formatTime as formatTimeWithPreferences,
+  formatDateTime as formatDateTimeWithPreferences
+} from '@/src/lib/date-time';
 
 /**
  * Interface for the timezone context
@@ -105,9 +113,43 @@ const TimezoneContext = createContext<TimezoneContextType | undefined>(undefined
  * Provider component for timezone context
  */
 export function TimezoneProvider({ children }: { children: ReactNode }) {
+  const { language } = useLocalization();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [userTimezone, setUserTimezone] = useState<string>('UTC');
   const [isDST, setIsDST] = useState<boolean>(false);
+  const [dateTimePreferences, setDateTimePreferences] = useState<Required<DateTimePreferences>>(() =>
+    getDateTimePreferences(undefined, language)
+  );
+
+  const locale = useMemo(() => {
+    if (!language) return 'en-US';
+    if (language.toLowerCase().startsWith('fr')) return 'fr-FR';
+    if (language.toLowerCase().startsWith('es')) return 'es-ES';
+    return 'en-US';
+  }, [language]);
+
+  const readStoredPreferences = useCallback(() => {
+    if (typeof window === 'undefined') return null;
+    const storedTimeFormat = localStorage.getItem('timeFormat') as DateTimePreferences['timeFormat'] | null;
+    const storedDateFormat = localStorage.getItem('dateFormat') as DateTimePreferences['dateFormat'] | null;
+    if (!storedTimeFormat && !storedDateFormat) return null;
+    return {
+      timeFormat: storedTimeFormat ?? undefined,
+      dateFormat: storedDateFormat ?? undefined,
+    } as DateTimePreferences;
+  }, []);
+
+  const persistPreferences = useCallback((preferences: Required<DateTimePreferences>) => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem('timeFormat', preferences.timeFormat);
+    localStorage.setItem('dateFormat', preferences.dateFormat);
+  }, []);
+
+  const applyPreferences = useCallback((preferences?: DateTimePreferences | null) => {
+    const normalized = getDateTimePreferences(preferences ?? undefined, language);
+    setDateTimePreferences(normalized);
+    persistPreferences(normalized);
+  }, [language, persistPreferences]);
 
   /**
    * Detect and set the user's timezone and DST status
@@ -140,10 +182,45 @@ export function TimezoneProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const refreshPreferences = useCallback(async () => {
+    if (typeof window === 'undefined') return;
+    const stored = readStoredPreferences();
+    if (stored) {
+      setDateTimePreferences(getDateTimePreferences(stored, language));
+    } else {
+      setDateTimePreferences(getDateTimePreferences(undefined, language));
+    }
+
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) return;
+
+    try {
+      const response = await fetch('/api/settings', {
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+        },
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      if (data.success && data.data) {
+        applyPreferences({
+          timeFormat: data.data.timeFormat,
+          dateFormat: data.data.dateFormat,
+        });
+      }
+    } catch (error) {
+      console.error('Error loading date/time preferences:', error);
+    }
+  }, [applyPreferences, language, readStoredPreferences]);
+
   // Initialize timezone detection on mount
   useEffect(() => {
     detectTimezone();
   }, [detectTimezone]);
+
+  useEffect(() => {
+    refreshPreferences();
+  }, [refreshPreferences]);
   
   // Refresh timezone when window gains focus (in case user changed system timezone)
   useEffect(() => {
@@ -157,6 +234,25 @@ export function TimezoneProvider({ children }: { children: ReactNode }) {
       return () => window.removeEventListener('focus', handleFocus);
     }
   }, [detectTimezone]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleSettingsUpdated = (event: Event) => {
+      const detail = (event as CustomEvent<DateTimePreferences>).detail;
+      applyPreferences(detail);
+    };
+
+    const handleCaretakerChanged = () => {
+      refreshPreferences();
+    };
+
+    window.addEventListener('settingsUpdated', handleSettingsUpdated as EventListener);
+    window.addEventListener('caretakerChanged', handleCaretakerChanged);
+    return () => {
+      window.removeEventListener('settingsUpdated', handleSettingsUpdated as EventListener);
+      window.removeEventListener('caretakerChanged', handleCaretakerChanged);
+    };
+  }, [applyPreferences, refreshPreferences]);
   
   /**
    * Check if a date is in DST for a specific timezone
@@ -182,11 +278,7 @@ export function TimezoneProvider({ children }: { children: ReactNode }) {
    */
   const formatDate = (
     isoString: string | null | undefined, 
-    formatOptions: Intl.DateTimeFormatOptions = {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    }
+    formatOptions?: Intl.DateTimeFormatOptions
   ): string => {
     if (!isoString) return '';
     
@@ -199,10 +291,20 @@ export function TimezoneProvider({ children }: { children: ReactNode }) {
       // Check if the date should be in DST
       const dateIsDST = isDaylightSavingTime(date, userTimezone);
       
+      const baseOptions: Intl.DateTimeFormatOptions = formatOptions
+        ? { ...formatOptions }
+        : {
+            hour: 'numeric',
+            minute: '2-digit',
+          };
+      if ((baseOptions.hour || baseOptions.minute) && baseOptions.hour12 === undefined) {
+        baseOptions.hour12 = dateTimePreferences.timeFormat === '12h';
+      }
+
       // Use the Intl.DateTimeFormat API which properly handles DST
-      const formatter = new Intl.DateTimeFormat('en-US', {
-        ...formatOptions,
-        timeZone: userTimezone
+      const formatter = new Intl.DateTimeFormat(locale, {
+        ...baseOptions,
+        timeZone: userTimezone,
       });
       
       const formattedDate = formatter.format(date);
@@ -223,10 +325,10 @@ export function TimezoneProvider({ children }: { children: ReactNode }) {
    * Format a time-only representation of an ISO date string in the user's timezone
    */
   const formatTime = (isoString: string | null | undefined): string => {
-    return formatDate(isoString, {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
+    return formatTimeWithPreferences(isoString, dateTimePreferences, {
+      locale,
+      timeZone: userTimezone,
+      language,
     });
   };
 
@@ -234,10 +336,10 @@ export function TimezoneProvider({ children }: { children: ReactNode }) {
    * Format a date-only representation of an ISO date string in the user's timezone
    */
   const formatDateOnly = (isoString: string | null | undefined): string => {
-    return formatDate(isoString, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return formatDateWithPreferences(isoString, dateTimePreferences, {
+      locale,
+      timeZone: userTimezone,
+      language,
     });
   };
 
@@ -245,13 +347,10 @@ export function TimezoneProvider({ children }: { children: ReactNode }) {
    * Format a date and time representation of an ISO date string in the user's timezone
    */
   const formatDateTime = (isoString: string | null | undefined): string => {
-    return formatDate(isoString, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
+    return formatDateTimeWithPreferences(isoString, dateTimePreferences, {
+      locale,
+      timeZone: userTimezone,
+      language,
     });
   };
 
@@ -305,7 +404,7 @@ export function TimezoneProvider({ children }: { children: ReactNode }) {
       const today = new Date();
       
       // Create a formatter that only includes date components (not time)
-      const formatter = new Intl.DateTimeFormat('en-US', {
+      const formatter = new Intl.DateTimeFormat(locale, {
         year: 'numeric',
         month: 'numeric',
         day: 'numeric',
@@ -334,7 +433,7 @@ export function TimezoneProvider({ children }: { children: ReactNode }) {
       yesterday.setDate(yesterday.getDate() - 1);
       
       // Create a formatter that only includes date components (not time)
-      const formatter = new Intl.DateTimeFormat('en-US', {
+      const formatter = new Intl.DateTimeFormat(locale, {
         year: 'numeric',
         month: 'numeric',
         day: 'numeric',
@@ -388,7 +487,7 @@ export function TimezoneProvider({ children }: { children: ReactNode }) {
       if (isNaN(utcDate.getTime())) return null;
       
       // Create a formatter for the user's timezone
-      const formatter = new Intl.DateTimeFormat('en-US', {
+      const formatter = new Intl.DateTimeFormat(locale, {
         timeZone: userTimezone,
         year: 'numeric',
         month: 'numeric',

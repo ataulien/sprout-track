@@ -42,7 +42,9 @@ import FamilyForm from '@/src/components/forms/FamilyForm';
 import AppConfigForm from '@/src/components/forms/AppConfigForm';
 import { ShareButton } from '@/src/components/ui/share-button';
 import { BetaSubscriberResponse, FeedbackResponse } from '@/app/api/types';
-import { useDeployment } from '@/app/context/deployment';import { useLocalization } from '@/src/context/localization';
+import { useDeployment } from '@/app/context/deployment';
+import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 import { 
   FamilyView, 
@@ -116,6 +118,7 @@ interface AccountData {
 
 export default function FamilyManagerPage() {
   const { t } = useLocalization();
+  const { formatDateTime } = useTimezone();
 
   const router = useRouter();
   const { isSaasMode } = useDeployment();
@@ -636,16 +639,9 @@ export default function FamilyManagerPage() {
   };
 
   // Format date/time for display
-  const formatDateTime = (dateString: string | null) => {
+  const formatDateTimeForDisplay = (dateString: string | null) => {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
+    return formatDateTime(dateString);
   };
 
   // Fetch accounts data
@@ -823,7 +819,7 @@ export default function FamilyManagerPage() {
             slugError={slugError}
             checkingSlug={checkingSlug}
             appConfig={appConfig}
-            formatDateTime={formatDateTime}
+            formatDateTime={formatDateTimeForDisplay}
           />
         )}
 
@@ -833,7 +829,7 @@ export default function FamilyManagerPage() {
             onDeleteInvite={deleteInvite}
             deletingInviteId={deletingInviteId}
             appConfig={appConfig}
-            formatDateTime={formatDateTime}
+            formatDateTime={formatDateTimeForDisplay}
           />
         )}
 
@@ -842,7 +838,7 @@ export default function FamilyManagerPage() {
             paginatedData={paginatedData as AccountData[]}
             onUpdateAccount={updateAccount}
             updatingAccountId={updatingAccountId}
-            formatDateTime={formatDateTime}
+            formatDateTime={formatDateTimeForDisplay}
           />
         )}
 
@@ -853,7 +849,7 @@ export default function FamilyManagerPage() {
             onDeleteSubscriber={deleteSubscriber}
             updatingSubscriberId={updatingSubscriberId}
             deletingSubscriberId={deletingSubscriberId}
-            formatDateTime={formatDateTime}
+            formatDateTime={formatDateTimeForDisplay}
           />
         )}
 
@@ -862,7 +858,7 @@ export default function FamilyManagerPage() {
             paginatedData={paginatedData as FeedbackResponse[]}
             onUpdateFeedback={updateFeedback}
             updatingFeedbackId={updatingFeedbackId}
-            formatDateTime={formatDateTime}
+            formatDateTime={formatDateTimeForDisplay}
             onRefresh={fetchFeedback}
           />
         )}

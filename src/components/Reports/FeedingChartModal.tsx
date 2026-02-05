@@ -20,6 +20,7 @@ import {
 } from 'recharts';
 import { ActivityType, DateRange } from './reports.types';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 export type FeedingChartMetric = 'bottle' | 'breast' | 'solids';
 
@@ -71,6 +72,7 @@ const FeedingChartModal: React.FC<FeedingChartModalProps> = ({
   dateRange,
 }) => {
   const { t } = useLocalization();
+  const { formatDateOnly } = useTimezone();
   // Calculate bottle feed data
   const bottleData = useMemo(() => {
     if (!activities.length || !dateRange.from || !dateRange.to || metric !== 'bottle') {
@@ -122,7 +124,7 @@ const FeedingChartModal: React.FC<FeedingChartModalProps> = ({
     const combinedData = sortedDays.map((dayKey) => {
       const dayData: any = {
         date: dayKey,
-        label: new Date(dayKey).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        label: formatDateOnly(new Date(dayKey).toISOString()),
         count: countsByDay[dayKey] || 0,
       };
       bottleTypes.forEach((type) => {
@@ -185,7 +187,7 @@ const FeedingChartModal: React.FC<FeedingChartModalProps> = ({
     const sortedDays = Object.keys(countsByDay).sort();
     return sortedDays.map((dayKey) => ({
       date: dayKey,
-      label: new Date(dayKey).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      label: formatDateOnly(new Date(dayKey).toISOString()),
       count: countsByDay[dayKey] || 0,
       leftAvg: leftDurationByDay[dayKey]?.count > 0 
         ? leftDurationByDay[dayKey].total / leftDurationByDay[dayKey].count 
@@ -245,7 +247,7 @@ const FeedingChartModal: React.FC<FeedingChartModalProps> = ({
     const combinedData = sortedDays.map((dayKey) => {
       const dayData: any = {
         date: dayKey,
-        label: new Date(dayKey).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        label: formatDateOnly(new Date(dayKey).toISOString()),
         count: countsByDay[dayKey] || 0,
       };
       foodTypes.forEach((food) => {
@@ -272,7 +274,7 @@ const FeedingChartModal: React.FC<FeedingChartModalProps> = ({
 
   const getDescription = (): string => {
     if (!dateRange.from || !dateRange.to) return '';
-    return `${t('From')} ${dateRange.from.toLocaleDateString()} to ${dateRange.to.toLocaleDateString()}`;
+    return `${t('From')} ${formatDateOnly(dateRange.from.toISOString())} to ${formatDateOnly(dateRange.to.toISOString())}`;
   };
 
   if (!metric) return null;
@@ -514,4 +516,3 @@ const FeedingChartModal: React.FC<FeedingChartModalProps> = ({
 };
 
 export default FeedingChartModal;
-

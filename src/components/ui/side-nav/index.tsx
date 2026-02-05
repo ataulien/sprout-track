@@ -25,6 +25,7 @@ import Image from 'next/image';
 import { useTheme } from '@/src/context/theme';
 import { useDeployment } from '@/app/context/deployment';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 import { cn } from '@/src/lib/utils';
 import { sideNavStyles, triggerButtonVariants } from './side-nav.styles';
 import { SideNavProps, SideNavTriggerProps, SideNavItemProps } from './side-nav.types';
@@ -159,6 +160,7 @@ export const SideNav: React.FC<SideNavProps> = ({
   const { theme } = useTheme();
   const { isSaasMode } = useDeployment();
   const { t } = useLocalization();
+  const { formatDateOnly } = useTimezone();
   const [isSystemDarkMode, setIsSystemDarkMode] = useState<boolean>(false);
   const [showChangelog, setShowChangelog] = useState<boolean>(false);
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
@@ -415,11 +417,7 @@ export const SideNav: React.FC<SideNavProps> = ({
                     </div>
                     <div className="text-center">
                       <p className={cn("text-xs text-amber-600", "side-nav-trial-text")}>
-                        {t('Ending')}: {new Date(accountStatus.trialEnds).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric'
-                        })}
+                        {t('Ending')}: {formatDateOnly(new Date(accountStatus.trialEnds).toISOString())}
                       </p>
                     </div>
                     <Button

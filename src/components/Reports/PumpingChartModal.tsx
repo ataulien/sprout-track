@@ -19,6 +19,7 @@ import {
 } from 'recharts';
 import { ActivityType, DateRange } from './reports.types';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 export type PumpingChartMetric = 'count' | 'duration' | 'amount';
 
@@ -53,6 +54,7 @@ const PumpingChartModal: React.FC<PumpingChartModalProps> = ({
   dateRange,
 }) => {
   const { t } = useLocalization();
+  const { formatDateOnly } = useTimezone();
   // Calculate pump count per day
   const countData = useMemo(() => {
     if (!activities.length || !dateRange.from || !dateRange.to || metric !== 'count') {
@@ -81,7 +83,7 @@ const PumpingChartModal: React.FC<PumpingChartModalProps> = ({
     return Object.entries(countsByDay)
       .map(([date, count]) => ({
         date,
-        label: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        label: formatDateOnly(new Date(date).toISOString()),
         value: count,
       }))
       .sort((a, b) => (a.date < b.date ? -1 : 1));
@@ -134,7 +136,7 @@ const PumpingChartModal: React.FC<PumpingChartModalProps> = ({
     return Object.entries(durationsByDay)
       .map(([date, data]) => ({
         date,
-        label: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        label: formatDateOnly(new Date(date).toISOString()),
         value: data.count > 0 ? data.total / data.count : 0,
       }))
       .sort((a, b) => (a.date < b.date ? -1 : 1));
@@ -206,7 +208,7 @@ const PumpingChartModal: React.FC<PumpingChartModalProps> = ({
     return Object.entries(amountsByDay)
       .map(([date, data]) => ({
         date,
-        label: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        label: formatDateOnly(new Date(date).toISOString()),
         dayTotal: data.dayTotal,
         leftTotal: data.leftTotal,
         rightTotal: data.rightTotal,
@@ -231,7 +233,7 @@ const PumpingChartModal: React.FC<PumpingChartModalProps> = ({
 
   const getDescription = (): string => {
     if (!dateRange.from || !dateRange.to) return '';
-    return `${t('From')} ${dateRange.from.toLocaleDateString()} to ${dateRange.to.toLocaleDateString()}`;
+    return `${t('From')} ${formatDateOnly(dateRange.from.toISOString())} to ${formatDateOnly(dateRange.to.toISOString())}`;
   };
 
   if (!metric) return null;
@@ -440,4 +442,3 @@ const PumpingChartModal: React.FC<PumpingChartModalProps> = ({
 };
 
 export default PumpingChartModal;
-

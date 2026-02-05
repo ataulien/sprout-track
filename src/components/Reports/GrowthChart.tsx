@@ -15,6 +15,7 @@ import { cn } from '@/src/lib/utils';
 import { useBaby } from '@/app/context/baby';
 import { growthChartStyles } from './growth-chart.styles';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 // Types
 export type GrowthMeasurementType = 'weight' | 'length' | 'head_circumference';
@@ -390,6 +391,7 @@ const CustomTooltip = ({ active, payload, label, settings, measurementType, t }:
 
 const GrowthChart: React.FC<GrowthChartProps> = ({ className }) => {
   const { t } = useLocalization();
+  const { formatDateOnly } = useTimezone();
   const { selectedBaby } = useBaby();
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
@@ -1023,7 +1025,7 @@ const GrowthChart: React.FC<GrowthChartProps> = ({ className }) => {
                   {m.ageMonths.toFixed(1)} months
                 </div>
                 <div className={cn(growthChartStyles.measurementDate, "growth-chart-measurement-date")}>
-                  {new Date(m.date).toLocaleDateString()}
+                  {formatDateOnly(new Date(m.date).toISOString())}
                 </div>
               </div>
             ))}

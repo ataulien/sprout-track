@@ -1171,5 +1171,18 @@
   "Your feedback and replies will appear here": "Vos commentaires et réponses apparaîtront ici",
   "Your feedback helps us improve the app. Please be as specific as possible about any issues or suggestions you have.": "Vos commentaires nous aident à améliorer l'application. Veuillez être aussi précis que possible sur tout problème ou suggestion que vous avez.",
   "Your payment was cancelled. No charges were made to your account.": "Votre paiement a été annulé. Aucun frais n'a été facturé à votre compte.",
-  "Your payment was processed, but we encountered an issue activating your account. Please contact support or try logging out and back in.": "Votre paiement a été traité, mais nous avons rencontré un problème lors de l'activation de votre compte. Veuillez contacter le support ou essayer de vous déconnecter et de vous reconnecter."
+  "Your payment was processed, but we encountered an issue activating your account. Please contact support or try logging out and back in.": "Votre paiement a été traité, mais nous avons rencontré un problème lors de l'activation de votre compte. Veuillez contacter le support ou essayer de vous déconnecter et de vous reconnecter.",
+  "Date & Time": "Date et heure",
+  "Time Format": "Format horaire",
+  "Date Format": "Format de date",
+  "Choose how times are displayed": "Choisissez comment les heures sont affichées",
+  "Choose how dates are displayed": "Choisissez comment les dates sont affichées",
+  "Select time format": "Sélectionnez le format horaire",
+  "Select date format": "Sélectionnez le format de date",
+  "24-hour": "24 h",
+  "12-hour (AM/PM)": "12 h (AM/PM)",
+  "DD/MM/YYYY": "DD/MM/YYYY",
+  "MM/DD/YYYY": "MM/DD/YYYY",
+  "YYYY-MM-DD": "YYYY-MM-DD",
+  "Yesterday": "Hier"
 }

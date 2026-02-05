@@ -3,6 +3,11 @@ import prisma from '@/prisma/db';
 import { ApiResponse, withAdminAuth, getAuthenticatedUser, AuthResult } from '@/app/api/utils/auth';
 import { Family } from '@prisma/client';
 
+const getDefaultDateFormat = (acceptLanguage?: string | null) => {
+  if (!acceptLanguage) return 'MM/DD/YYYY';
+  return acceptLanguage.toLowerCase().startsWith('fr') ? 'DD/MM/YYYY' : 'MM/DD/YYYY';
+};
+
 interface SetupStartRequest {
   name: string;
   slug: string;
@@ -23,6 +28,8 @@ async function handler(req: NextRequest): Promise<NextResponse<ApiResponse<Famil
   if (!authResult.authenticated) {
     return NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 });
   }
+
+  const defaultDateFormat = getDefaultDateFormat(req.headers.get('accept-language'));
 
   // Check for setup token authentication
   let setupTokenData = null;
@@ -77,6 +84,8 @@ async function handler(req: NextRequest): Promise<NextResponse<ApiResponse<Famil
           data: {
             familyId: family.id,
             familyName: name,
+            timeFormat: '24h',
+            dateFormat: defaultDateFormat,
           },
         });
 
@@ -142,6 +151,8 @@ async function handler(req: NextRequest): Promise<NextResponse<ApiResponse<Famil
             defaultHeightUnit: 'IN',
             defaultWeightUnit: 'LB',
             defaultTempUnit: 'F',
+            timeFormat: '24h',
+            dateFormat: defaultDateFormat,
             activitySettings: JSON.stringify({
               global: {
                 order: ['sleep', 'feed', 'diaper', 'note', 'bath', 'pump', 'measurement', 'milestone', 'medicine'],
@@ -226,6 +237,8 @@ async function handler(req: NextRequest): Promise<NextResponse<ApiResponse<Famil
             data: {
               familyId: family.id,
               familyName: name,
+              timeFormat: '24h',
+              dateFormat: defaultDateFormat,
             },
           });
 
@@ -277,6 +290,8 @@ async function handler(req: NextRequest): Promise<NextResponse<ApiResponse<Famil
               data: {
                 familyId: family.id,
                 familyName: name,
+                timeFormat: '24h',
+                dateFormat: defaultDateFormat,
               },
             });
 

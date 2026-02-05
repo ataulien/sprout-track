@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import { useTimezone } from '@/app/context/timezone';
 import './calendar.css'; // Import the CSS file with dark mode overrides
 
 import {
@@ -208,10 +209,11 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
       return normalizedDate > normalizedFrom && normalizedDate < normalizedTo;
     };
 
+    const { formatDate, formatDateOnly } = useTimezone();
     // Function to format date for display
     const formatDate = (date: Date | null | undefined) => {
       if (!date) return '';
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      return formatDateOnly(date.toISOString());
     };
 
     // Function to handle month selection
@@ -412,7 +414,7 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
                       day.isDisabled && "calendar-day-disabled",
                       day.isOutsideMonth && "calendar-day-outside"
                     )}
-                    aria-label={day.date.toLocaleDateString()}
+                    aria-label={formatDateOnly(day.date.toISOString())}
                     aria-selected={(day.isSelected || day.isRangeStart || day.isRangeEnd) ? "true" : undefined}
                     tabIndex={day.isSelected || day.isRangeStart || day.isRangeEnd || (initialFocus && index === 0) ? 0 : -1}
                   >
@@ -473,7 +475,7 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
               )}
               aria-label="Select month"
             >
-              {month.toLocaleDateString('en-US', { month: 'long' })}
+              {formatDate(month.toISOString(), { month: 'long' })}
             </button>
             
             <button

@@ -9,6 +9,7 @@ import { ActivityTabProps, ActivityType } from './reports.types';
 import { getActivityDetails } from '@/src/components/Timeline/utils';
 import { ActivityType as TimelineActivityType } from '@/src/components/Timeline/types';
 import { useLocalization } from '@/src/context/localization';
+import { formatDate, formatTime as formatTimeDisplay, getDateTimePreferences } from '@/src/lib/date-time';
 
 // Local helper to get activity time that works with reports ActivityType
 const getActivityTimeLocal = (activity: ActivityType): string => {
@@ -204,6 +205,14 @@ const ActivityTab: React.FC<ActivityTabProps> = ({
 }) => {
   const { t } = useLocalization();
   const [settings, setSettings] = useState<Settings | null>(null);
+  const dateTimePreferences = useMemo(
+    () =>
+      getDateTimePreferences({
+        timeFormat: settings?.timeFormat as '24h' | '12h' | undefined,
+        dateFormat: settings?.dateFormat as 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD' | undefined,
+      }),
+    [settings]
+  );
   const [hoveredActivity, setHoveredActivity] = useState<NormalizedActivity | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -361,20 +370,13 @@ const ActivityTab: React.FC<ActivityTabProps> = ({
 
       return {
         date: day.date,
-        label: day.date.toLocaleDateString(undefined, {
-          weekday: 'short',
-          month: 'short',
-          day: 'numeric',
-        }),
-        shortLabel: day.date.toLocaleDateString(undefined, {
-          month: 'short',
-          day: 'numeric',
-        }),
+        label: formatDate(day.date, dateTimePreferences),
+        shortLabel: formatDate(day.date, dateTimePreferences),
         activities: activitiesWithLanes,
         maxLanes,
       };
     });
-  }, [activities, dateRange]);
+  }, [activities, dateRange, dateTimePreferences]);
 
   // Handle hover events - tooltip follows cursor exactly
   const handleMouseEnter = useCallback((e: React.MouseEvent, act: NormalizedActivity) => {
@@ -397,10 +399,10 @@ const ActivityTab: React.FC<ActivityTabProps> = ({
   const formatTime = useCallback((h: number) => {
     const hours = Math.floor(h);
     const mins = Math.round((h - hours) * 60);
-    const period = hours >= 12 ? 'PM' : 'AM';
-    const displayHour = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-    return `${displayHour}:${mins.toString().padStart(2, '0')} ${period}`;
-  }, []);
+    const date = new Date();
+    date.setHours(hours, mins, 0, 0);
+    return formatTimeDisplay(date, dateTimePreferences);
+  }, [dateTimePreferences]);
 
   // Generate hour grid lines (every hour from 0-24)
   const hourLines = useMemo(() => {

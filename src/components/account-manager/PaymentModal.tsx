@@ -22,6 +22,7 @@ import {
 import { cn } from '@/src/lib/utils';
 import { PaymentModalProps, PricingPlan, SubscriptionStatus } from './payment-modal.types';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 import './account-manager.css';
 
@@ -54,6 +55,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   onPaymentSuccess,
 }) => {
   const { t } = useLocalization();
+  const { formatDateOnly } = useTimezone();
   
   // State management
   const [loading, setLoading] = useState(false);
@@ -245,7 +247,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                     <Calendar className="h-4 w-4" />
                     <span>
                       {subscriptionStatus.cancelAtPeriodEnd ? 'Expires' : 'Renews'} on{' '}
-                      {new Date(subscriptionStatus.currentPeriodEnd).toLocaleDateString()}
+                      {formatDateOnly(new Date(subscriptionStatus.currentPeriodEnd).toISOString())}
                     </span>
                   </div>
 
@@ -266,7 +268,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                         <span className="font-medium">{t('Subscription Cancelled')}</span>
                       </div>
                       <p className={cn("text-sm text-amber-600 mt-1", "payment-modal-cancelled-warning-description")}>
-                        {t('You will have access until')} {new Date(subscriptionStatus.currentPeriodEnd).toLocaleDateString()}
+                        {t('You will have access until')} {formatDateOnly(new Date(subscriptionStatus.currentPeriodEnd).toISOString())}
                       </p>
                     </div>
                   )}

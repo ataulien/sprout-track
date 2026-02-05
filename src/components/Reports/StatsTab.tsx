@@ -57,7 +57,7 @@ const StatsTab: React.FC<StatsTabProps> = ({
 }) => {
   const { t } = useLocalization();
   const { selectedBaby } = useBaby();
-  const { toLocalDate } = useTimezone();
+  const { toLocalDate, formatDateOnly } = useTimezone();
   const [temperatureMeasurements, setTemperatureMeasurements] = useState<MeasurementActivity[]>([]);
 
   // Helper function to get the night period date key for a sleep entry
@@ -673,7 +673,7 @@ const StatsTab: React.FC<StatsTabProps> = ({
     const avgNapDurationSeries = Object.entries(napDataByDay)
       .map(([date, data]) => ({
         date,
-        label: new Date(date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        label: formatDateOnly(new Date(`${date}T12:00:00`).toISOString()),
         value: data.count > 0 ? Math.round(data.totalMinutes / data.count) : 0,
       }))
       .sort((a, b) => (a.date < b.date ? -1 : 1));
@@ -681,7 +681,7 @@ const StatsTab: React.FC<StatsTabProps> = ({
     const dailyNapTotalSeries = Object.entries(napMinutesByDay)
       .map(([date, total]) => ({
         date,
-        label: new Date(date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        label: formatDateOnly(new Date(`${date}T12:00:00`).toISOString()),
         value: total,
       }))
       .sort((a, b) => (a.date < b.date ? -1 : 1));
@@ -696,7 +696,7 @@ const StatsTab: React.FC<StatsTabProps> = ({
       // The nightKey is the evening date (e.g., 7/12), but we display it as the morning date (7/13)
       const displayDate = new Date(nightKey + 'T12:00:00');
       displayDate.setDate(displayDate.getDate() + 1);
-      const label = displayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const label = formatDateOnly(displayDate.toISOString());
 
       // For night sleep, show total duration (not average per session)
       nightSleepSeries.push({

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Plus, ChevronUp, ChevronDown, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
@@ -12,6 +14,7 @@ import { cn } from '@/src/lib/utils';
 import CalendarDayView from '@/src/components/CalendarDayView';
 import { CalendarProps, CalendarState } from './calendar.types';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 import './calendar.css';
 
@@ -28,6 +31,7 @@ import './calendar.css';
 export function Calendar({
  selectedBabyId, userTimezone, onDateSelect }: CalendarProps) {
   const { t } = useLocalization();
+  const { formatDate } = useTimezone();
   
   // Component state
   const [state, setState] = useState<CalendarState>({
@@ -228,7 +232,7 @@ export function Calendar({
    * Date formatting and checking helpers
    */
   const formatMonthYear = (date: Date): string => {
-    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    return formatDate(date.toISOString(), { month: 'long', year: 'numeric' });
   };
 
   const isToday = (date: Date): boolean => {

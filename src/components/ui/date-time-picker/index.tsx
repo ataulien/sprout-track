@@ -5,7 +5,7 @@ import './date-time-picker.css';
 import { Calendar } from '@/src/components/ui/calendar';
 import { TimeEntry } from '@/src/components/ui/time-entry';
 import { cn } from '@/src/lib/utils';
-import { format, isValid } from 'date-fns';
+import { isValid } from 'date-fns';
 import { CalendarIcon, Clock } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import {
@@ -13,6 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/src/components/ui/popover';
+import { useTimezone } from '@/app/context/timezone';
 
 // Import types and styles
 import { DateTimePickerProps } from './date-time-picker.types';
@@ -45,6 +46,7 @@ export function DateTimePicker({
   disabled = false,
   placeholder = "Select date and time...",
 }: DateTimePickerProps) {
+  const { formatDateOnly, formatTime } = useTimezone();
   // Allow for null date value
   const [date, setDate] = useState<Date | null>(() => {
     // Check if value is a valid Date
@@ -106,23 +108,13 @@ export function DateTimePicker({
   // Format the date for display
   const formatDate = (date: Date | null): string => {
     if (!date || !isValid(date)) return 'Select date';
-    try {
-      return format(date, 'MMM d, yyyy'); // e.g., "Apr 7, 2025"
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return 'Select date';
-    }
+    return formatDateOnly(date.toISOString()) || 'Select date';
   };
   
   // Format the time for display
-  const formatTime = (date: Date | null): string => {
+  const formatTimeLabel = (date: Date | null): string => {
     if (!date || !isValid(date)) return 'Select time';
-    try {
-      return format(date, 'h:mm a'); // e.g., "1:55 PM"
-    } catch (error) {
-      console.error('Error formatting time:', error);
-      return 'Select time';
-    }
+    return formatTime(date.toISOString()) || 'Select time';
   };
   
   // The time popover will now close when clicking outside, removing the need for a "Done" button.
@@ -168,7 +160,7 @@ export function DateTimePicker({
             disabled={disabled}
           >
             <Clock className="h-4 w-4 date-time-picker-clock-icon" />
-            <span>{formatTime(date)}</span>
+            <span>{formatTimeLabel(date)}</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent 

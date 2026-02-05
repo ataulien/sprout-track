@@ -25,6 +25,7 @@ import BabyModal from '@/src/components/modals/BabyModal';
 import ChangePinModal from '@/src/components/modals/ChangePinModal';
 
 import { useLocalization } from '@/src/context/localization';
+import { getDefaultDateFormat } from '@/src/lib/date-time';
 
 interface SettingsModalProps {
   open: boolean;
@@ -46,7 +47,7 @@ export default function SettingsModal({
   selectedBabyId,
   variant = 'default'
 }: SettingsModalProps) {
-  const { t } = useLocalization();
+  const { t, language } = useLocalization();
   const [settings, setSettings] = useState<Settings | null>(null);
   const [babies, setBabies] = useState<Baby[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,6 +58,16 @@ export default function SettingsModal({
   const [showChangePinModal, setShowChangePinModal] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const defaultDateFormat = getDefaultDateFormat(language);
+  const timeFormatOptions = [
+    { value: '24h', label: t('24-hour') },
+    { value: '12h', label: t('12-hour (AM/PM)') },
+  ];
+  const dateFormatOptions = [
+    { value: 'DD/MM/YYYY', label: t('DD/MM/YYYY') },
+    { value: 'MM/DD/YYYY', label: t('MM/DD/YYYY') },
+    { value: 'YYYY-MM-DD', label: t('YYYY-MM-DD') },
+  ];
 
   useEffect(() => {
     setLocalSelectedBabyId(selectedBabyId);
@@ -106,6 +117,14 @@ export default function SettingsModal({
       if (response.ok) {
         const data = await response.json();
         setSettings(data.data);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('settingsUpdated', {
+            detail: {
+              timeFormat: data.data.timeFormat,
+              dateFormat: data.data.dateFormat,
+            }
+          }));
+        }
       }
     } catch (error) {
       console.error('Error updating settings:', error);
@@ -225,6 +244,50 @@ export default function SettingsModal({
                   </Button>
                 </div>
                 <p className="text-sm text-gray-500 mt-1">{t('PIN must be between 6 and 10 digits')}</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <Label className="form-label">{t('Time Format')}</Label>
+                <p className="text-sm text-gray-500">{t('Choose how times are displayed')}</p>
+                <Select
+                  value={settings?.timeFormat || '24h'}
+                  onValueChange={(value) => handleSettingsChange({ timeFormat: value as Settings['timeFormat'] })}
+                  disabled={loading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('Select time format')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {timeFormatOptions.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="form-label">{t('Date Format')}</Label>
+                <p className="text-sm text-gray-500">{t('Choose how dates are displayed')}</p>
+                <Select
+                  value={settings?.dateFormat || defaultDateFormat}
+                  onValueChange={(value) => handleSettingsChange({ dateFormat: value as Settings['dateFormat'] })}
+                  disabled={loading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('Select date format')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {dateFormatOptions.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             

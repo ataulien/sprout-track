@@ -16,6 +16,7 @@ import {
 } from 'recharts';
 import { ActivityType, DateRange } from './reports.types';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 export type DiaperChartMetric = 'wet' | 'poopy';
 
@@ -41,6 +42,7 @@ const DiaperChartModal: React.FC<DiaperChartModalProps> = ({
   dateRange,
 }) => {
   const { t } = useLocalization();
+  const { formatDateOnly } = useTimezone();
   
   // Calculate daily diaper counts
   const chartData = useMemo(() => {
@@ -80,7 +82,7 @@ const DiaperChartModal: React.FC<DiaperChartModalProps> = ({
     return Object.entries(countsByDay)
       .map(([date, count]) => ({
         date,
-        label: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        label: formatDateOnly(new Date(date).toISOString()),
         value: count,
       }))
       .sort((a, b) => (a.date < b.date ? -1 : 1));
@@ -89,7 +91,7 @@ const DiaperChartModal: React.FC<DiaperChartModalProps> = ({
   const title = metric === 'wet' ? t('Wet Diapers Over Time') : t('Poopy Diapers Over Time');
   const description =
     dateRange.from && dateRange.to
-      ? `${t('From')} ${dateRange.from.toLocaleDateString()} to ${dateRange.to.toLocaleDateString()}`
+      ? `${t('From')} ${formatDateOnly(dateRange.from.toISOString())} to ${formatDateOnly(dateRange.to.toISOString())}`
       : undefined;
 
   return (
@@ -140,4 +142,3 @@ const DiaperChartModal: React.FC<DiaperChartModalProps> = ({
 };
 
 export default DiaperChartModal;
-

@@ -42,7 +42,7 @@ import { useLocalization } from '@/src/context/localization';
  */
 const ActiveDosesTab: React.FC<ActiveDosesTabProps> = ({ babyId, refreshData, onGiveMedicine, refreshTrigger }) => {
   const { t } = useLocalization();
-  const { formatDate, calculateDurationMinutes } = useTimezone();
+  const { formatDate, formatDateTime, calculateDurationMinutes } = useTimezone();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeDoses, setActiveDoses] = useState<ActiveDose[]>([]);
@@ -406,13 +406,7 @@ const ActiveDosesTab: React.FC<ActiveDosesTabProps> = ({ babyId, refreshData, on
                 {dose.hasRecentDoses ? (
                   <>{t('Total in last 24h:')} {dose.totalIn24Hours} {dose.unitAbbr}</>
                 ) : (
-                  <>{t('Last Dose:')} {new Date(dose.time).toLocaleDateString('en-US', { 
-                    month: 'long', 
-                    day: 'numeric', 
-                    hour: 'numeric', 
-                    minute: '2-digit',
-                    hour12: true 
-                  })} - {dose.doseAmount} {dose.unitAbbr}</>
+                  <>{t('Last Dose:')} {formatDateTime(dose.time)} - {dose.doseAmount} {dose.unitAbbr}</>
                 )}
               </div>
               

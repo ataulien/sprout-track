@@ -1171,5 +1171,18 @@
   "Your feedback and replies will appear here": "Your feedback and replies will appear here",
   "Your feedback helps us improve the app. Please be as specific as possible about any issues or suggestions you have.": "Your feedback helps us improve the app. Please be as specific as possible about any issues or suggestions you have.",
   "Your payment was cancelled. No charges were made to your account.": "Your payment was cancelled. No charges were made to your account.",
-  "Your payment was processed, but we encountered an issue activating your account. Please contact support or try logging out and back in.": "Your payment was processed, but we encountered an issue activating your account. Please contact support or try logging out and back in."
+  "Your payment was processed, but we encountered an issue activating your account. Please contact support or try logging out and back in.": "Your payment was processed, but we encountered an issue activating your account. Please contact support or try logging out and back in.",
+  "Date & Time": "Date & Time",
+  "Time Format": "Time Format",
+  "Date Format": "Date Format",
+  "Choose how times are displayed": "Choose how times are displayed",
+  "Choose how dates are displayed": "Choose how dates are displayed",
+  "Select time format": "Select time format",
+  "Select date format": "Select date format",
+  "24-hour": "24-hour",
+  "12-hour (AM/PM)": "12-hour (AM/PM)",
+  "DD/MM/YYYY": "DD/MM/YYYY",
+  "MM/DD/YYYY": "MM/DD/YYYY",
+  "YYYY-MM-DD": "YYYY-MM-DD",
+  "Yesterday": "Yesterday"
 }

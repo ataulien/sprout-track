@@ -28,6 +28,10 @@ async function handleGet(req: NextRequest, authContext: AuthResult) {
     });
     
     if (!settings) {
+      const acceptLanguage = req.headers.get('accept-language') || '';
+      const isFrenchLocale = acceptLanguage.toLowerCase().startsWith('fr');
+      const defaultDateFormat = isFrenchLocale ? 'DD/MM/YYYY' : 'MM/DD/YYYY';
+
       settings = await prisma.settings.create({
         data: {
           familyName: 'My Family', // Default family name
@@ -36,7 +40,21 @@ async function handleGet(req: NextRequest, authContext: AuthResult) {
           defaultHeightUnit: 'IN',
           defaultWeightUnit: 'LB',
           defaultTempUnit: 'F',
+          timeFormat: '24h',
+          dateFormat: defaultDateFormat,
           familyId: targetFamilyId,
+        },
+      });
+    } else if (!settings.timeFormat || !settings.dateFormat) {
+      const acceptLanguage = req.headers.get('accept-language') || '';
+      const isFrenchLocale = acceptLanguage.toLowerCase().startsWith('fr');
+      const defaultDateFormat = isFrenchLocale ? 'DD/MM/YYYY' : 'MM/DD/YYYY';
+
+      settings = await prisma.settings.update({
+        where: { id: settings.id },
+        data: {
+          timeFormat: settings.timeFormat || '24h',
+          dateFormat: settings.dateFormat || defaultDateFormat,
         },
       });
     }
@@ -101,11 +119,23 @@ async function handlePut(req: NextRequest, authContext: AuthResult) {
     const allowedFields: (keyof Settings)[] = [
       'familyName', 'securityPin', 'authType', 'defaultBottleUnit', 'defaultSolidsUnit',
       'defaultHeightUnit', 'defaultWeightUnit', 'defaultTempUnit',
-      'enableDebugTimer', 'enableDebugTimezone'
+      'enableDebugTimer', 'enableDebugTimezone', 'timeFormat', 'dateFormat'
     ];
 
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
+        if (field === 'timeFormat' && !['24h', '12h'].includes(body[field])) {
+          return NextResponse.json<ApiResponse<Settings>>(
+            { success: false, error: 'Invalid time format' },
+            { status: 400 }
+          );
+        }
+        if (field === 'dateFormat' && !['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY-MM-DD'].includes(body[field])) {
+          return NextResponse.json<ApiResponse<Settings>>(
+            { success: false, error: 'Invalid date format' },
+            { status: 400 }
+          );
+        }
         (data as any)[field] = body[field];
       }
     }

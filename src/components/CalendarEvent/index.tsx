@@ -3,6 +3,7 @@ import { cn } from '@/src/lib/utils';
 import { CalendarEventProps } from './calendar-event.types';
 import { calendarEventStyles as styles } from './calendar-event.styles';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 import { 
   Calendar, 
@@ -26,34 +27,24 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   className,
 }) => {
   const { t } = useLocalization();
+  const { formatDateOnly, formatTime, formatDateTime } = useTimezone();
   
   // Format date for display
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    });
+    return formatDateOnly(dateString);
   };
   
   // Format time for display
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
+  const formatTimeString = (dateString: string) => {
+    return formatTime(dateString);
   };
   
   // Format date and time for display
-  const formatDateTime = (dateString: string) => {
+  const formatDateTimeString = (dateString: string) => {
     if (event.allDay) {
       return formatDate(dateString);
     }
-    return `${formatDate(dateString)} at ${formatTime(dateString)}`;
+    return formatDateTime(dateString);
   };
   
   // Get recurrence pattern text
@@ -152,10 +143,10 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         <div className={styles.detail}>
           <Calendar className={styles.icon} />
           <div>
-            <div>{formatDateTime(event.startTime)}</div>
+            <div>{formatDateTimeString(event.startTime)}</div>
             {event.endTime && !event.allDay && (
               <div className={styles.endTime}>
-                to {formatTime(event.endTime)}
+                to {formatTimeString(event.endTime)}
               </div>
             )}
           </div>

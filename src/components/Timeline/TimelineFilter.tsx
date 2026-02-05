@@ -28,6 +28,7 @@ import {
 } from '@/src/components/ui/popover';
 import { Calendar } from '@/src/components/ui/calendar';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 const TimelineFilter = ({
   selectedDate,
@@ -39,6 +40,7 @@ const TimelineFilter = ({
   
 
   const { t } = useLocalization();  
+  const { formatDateOnly } = useTimezone();
 
   // State for popover open/close
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -78,11 +80,7 @@ const TimelineFilter = ({
               size="sm"
               className="h-7 px-2 text-sm font-medium text-white hover:bg-transparent hover:text-white/90"
             >
-              {selectedDate.toLocaleDateString('en-US', { 
-                month: '2-digit', 
-                day: '2-digit',
-                year: 'numeric'
-              })}
+              {formatDateOnly(selectedDate.toISOString())}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="p-0 w-auto" align="start">

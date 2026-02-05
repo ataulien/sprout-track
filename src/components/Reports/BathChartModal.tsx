@@ -19,6 +19,7 @@ import {
 } from 'recharts';
 import { ActivityType, DateRange } from './reports.types';
 import { useLocalization } from '@/src/context/localization';
+import { useTimezone } from '@/app/context/timezone';
 
 export type BathChartMetric = 'total' | 'avgPerWeek' | 'soapShampoo';
 
@@ -41,14 +42,6 @@ function getWeekKey(date: Date): string {
   return monday.toISOString().split('T')[0];
 }
 
-// Helper function to format week label
-function formatWeekLabel(weekKey: string): string {
-  const date = new Date(weekKey);
-  const endDate = new Date(date);
-  endDate.setDate(endDate.getDate() + 6); // Sunday of the week
-  return `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
-}
-
 /**
  * BathChartModal Component
  *
@@ -62,6 +55,14 @@ const BathChartModal: React.FC<BathChartModalProps> = ({
   dateRange,
 }) => {
   const { t } = useLocalization();
+  const { formatDateOnly } = useTimezone();
+
+  const formatWeekLabel = (weekKey: string): string => {
+    const date = new Date(weekKey);
+    const endDate = new Date(date);
+    endDate.setDate(endDate.getDate() + 6); // Sunday of the week
+    return `${formatDateOnly(date.toISOString())} - ${formatDateOnly(endDate.toISOString())}`;
+  };
   // Calculate daily bath counts
   const dailyData = useMemo(() => {
     if (!activities.length || !dateRange.from || !dateRange.to || metric !== 'total') {
@@ -90,7 +91,7 @@ const BathChartModal: React.FC<BathChartModalProps> = ({
     return Object.entries(countsByDay)
       .map(([date, count]) => ({
         date,
-        label: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        label: formatDateOnly(new Date(date).toISOString()),
         value: count,
       }))
       .sort((a, b) => (a.date < b.date ? -1 : 1));
@@ -224,7 +225,7 @@ const BathChartModal: React.FC<BathChartModalProps> = ({
 
   const getDescription = (): string => {
     if (!dateRange.from || !dateRange.to) return '';
-    return `${t('From')} ${dateRange.from.toLocaleDateString()} to ${dateRange.to.toLocaleDateString()}`;
+    return `${t('From')} ${formatDateOnly(dateRange.from.toISOString())} to ${formatDateOnly(dateRange.to.toISOString())}`;
   };
 
   if (!metric) return null;
@@ -367,4 +368,3 @@ const BathChartModal: React.FC<BathChartModalProps> = ({
 };
 
 export default BathChartModal;
-
