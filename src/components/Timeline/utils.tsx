@@ -156,9 +156,15 @@ export const getActivityDetails = (activity: ActivityType, settings: Settings | 
         }
       };
       const formatLocation = (location: string) => {
-        if (location === 'OTHER') return t('Other');
-        
-        return location;
+        const normalized = location.replace(/_/g, ' ').toLowerCase();
+        const locationMap: Record<string, string> = {
+          'crib': t('Crib'),
+          'car seat': t('Car Seat'),
+          'parents room': t('Parents Room'),
+          'contact': t('Contact'),
+          'other': t('Other')
+        };
+        return locationMap[normalized] || location;
       };
       const details = [
         { label: t('Type'), value: activity.type === 'NAP' ? t('Nap') : t('Night Sleep') },
@@ -511,10 +517,17 @@ export const getActivityDescription = (activity: ActivityType, settings: Setting
       // Format location
       let locationText = '';
       if (activity.location) {
-        const location = activity.location === 'OTHER' ? t('Other') : activity.location.split('_').map(word => 
+        const normalized = activity.location.replace(/_/g, ' ').toLowerCase();
+        const locationMap: Record<string, string> = {
+          'crib': t('Crib'),
+          'car seat': t('Car Seat'),
+          'parents room': t('Parents Room'),
+          'contact': t('Contact'),
+          'other': t('Other')
+        };
+        locationText = locationMap[normalized] || activity.location.split('_').map(word => 
           word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         ).join(' ');
-        locationText = location;
       }
       
       // Format quality
