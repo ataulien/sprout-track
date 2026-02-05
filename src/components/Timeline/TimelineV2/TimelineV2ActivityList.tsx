@@ -278,15 +278,26 @@ const TimelineV2ActivityList = ({
                                     }
                                     
                                     if ('duration' in activity) {
-                                      const location = ('location' in activity && activity.location && activity.location !== 'OTHER') ? 
-                                        activity.location.split('_').map((word: string) => 
+                                      const locationMap: Record<string, string> = {
+                                        'crib': t('Crib'),
+                                        'car seat': t('Car Seat'),
+                                        'parents room': t('Parents Room'),
+                                        'contact': t('Contact'),
+                                        'other': t('Other'),
+                                        'bassinet': t('Bassinet'),
+                                        'stroller': t('Stroller')
+                                      };
+                                      const location = ('location' in activity && activity.location && activity.location !== 'OTHER') ? (() => {
+                                        const normalized = activity.location.replace(/_/g, ' ').toLowerCase();
+                                        return locationMap[normalized] || activity.location.split('_').map((word: string) => 
                                           word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                                        ).join(' ') : '';
+                                        ).join(' ');
+                                      })() : '';
                                       const duration = activity.duration ? `${Math.floor(activity.duration / 60)}h ${activity.duration % 60}m` : '';
                                       const parts = [];
                                       if (location) parts.push(location);
                                       if (duration) parts.push(duration);
-                                      if (!('endTime' in activity)) parts.push('Still asleep');
+                                      if (!('endTime' in activity)) parts.push(t('Still asleep'));
                                       return parts.length > 0 ? parts.join(' • ') : t('Sleep');
                                     }
                                     
@@ -451,4 +462,3 @@ const TimelineV2ActivityList = ({
 };
 
 export default TimelineV2ActivityList;
-

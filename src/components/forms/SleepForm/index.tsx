@@ -24,7 +24,7 @@ import { useToast } from '@/src/components/ui/toast';
 import { handleExpirationError } from '@/src/lib/expiration-error-handler';
 import { useLocalization } from '@/src/context/localization';
 
-// Note: DEFAULT_LOCATIONS are displayed as-is but could be localized if needed
+// Note: DEFAULT_LOCATIONS are stored as English values but displayed via translations.
 const DEFAULT_LOCATIONS = ['Bassinet', 'Stroller', 'Crib', 'Car Seat', 'Parents Room', 'Contact', 'Other'];
 
 interface SleepFormProps {
@@ -554,7 +554,7 @@ export default function SleepForm({
                   <SelectContent>
                     {DEFAULT_LOCATIONS.map((location) => (
                       <SelectItem key={location} value={location}>
-                        {location}
+                        {t(location)}
                       </SelectItem>
                     ))}
                     <SelectItem value="Custom">{t('Custom')}</SelectItem>

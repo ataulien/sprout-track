@@ -432,13 +432,31 @@ const TimelineActivityList = ({
                                           // Generate meaningful summaries for each activity type
                                           if ('duration' in activity) {
                                             // Sleep activity
-                                            const location = ('location' in activity && activity.location && activity.location !== 'OTHER') ? 
-                                              activity.location.split('_').map((word: string) => 
+                                            const locationMap: Record<string, string> = {
+                                              'crib': t('Crib'),
+                                              'car seat': t('Car Seat'),
+                                              'parents room': t('Parents Room'),
+                                              'contact': t('Contact'),
+                                              'other': t('Other'),
+                                              'bassinet': t('Bassinet'),
+                                              'stroller': t('Stroller')
+                                            };
+                                            const location = ('location' in activity && activity.location && activity.location !== 'OTHER') ? (() => {
+                                              const normalized = activity.location.replace(/_/g, ' ').toLowerCase();
+                                              return locationMap[normalized] || activity.location.split('_').map((word: string) => 
                                                 word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                                              ).join(' ') : '';
+                                              ).join(' ');
+                                            })() : '';
                                             const duration = activity.duration ? `${Math.floor(activity.duration / 60)}h ${activity.duration % 60}m` : '';
-                                            const quality = ('quality' in activity && activity.quality) ? 
-                                              activity.quality.charAt(0).toUpperCase() + activity.quality.slice(1).toLowerCase() : '';
+                                            const quality = ('quality' in activity && activity.quality) ? (() => {
+                                              const qualityMap: Record<string, string> = {
+                                                'POOR': t('Poor'),
+                                                'FAIR': t('Fair'),
+                                                'GOOD': t('Good'),
+                                                'EXCELLENT': t('Excellent')
+                                              };
+                                              return qualityMap[activity.quality] || activity.quality.charAt(0).toUpperCase() + activity.quality.slice(1).toLowerCase();
+                                            })() : '';
                                             return [location, duration, quality].filter(Boolean).join(' • ');
                                           }
                                           
