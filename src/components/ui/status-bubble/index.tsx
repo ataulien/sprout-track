@@ -126,7 +126,7 @@ export function StatusBubble({
       )}
     >
       {icon}
-      <span>{formatDuration(displayDuration)}</span>
+      <span>{formatDuration(displayDuration * 60000)}</span>
     </div>
   );
 }

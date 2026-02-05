@@ -47,7 +47,7 @@ export const useActivityDescription = () => {
    * Formats duration in minutes to HH:MM format with parentheses
    */
   const formatDuration = (minutes: number): string => {
-    return `(${formatDurationTime(minutes)})`;
+    return `(${formatDurationTime(minutes * 60000)})`;
   };
   
   /**

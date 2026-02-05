@@ -8,19 +8,11 @@ import { Textarea } from '@/src/components/ui/textarea';
 import { Label } from '@/src/components/ui/label';
 import { DateTimePicker } from '@/src/components/ui/date-time-picker';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/src/components/ui/select';
-import {
   FormPage, 
   FormPageContent, 
   FormPageFooter 
 } from '@/src/components/ui/form-page';
 import { useTimezone } from '@/app/context/timezone';
-import { useTheme } from '@/src/context/theme';
 import { useToast } from '@/src/components/ui/toast';
 import { handleExpirationError } from '@/src/lib/expiration-error-handler';
 import { Plus, Minus } from 'lucide-react';
@@ -47,29 +39,8 @@ export default function PumpForm({
   onSuccess,
 }: PumpFormProps) {
   const { t } = useLocalization();
-  const { formatDate, toUTCString } = useTimezone();
-  const { theme } = useTheme();
+  const { toUTCString, formatDuration } = useTimezone();
   const { showToast } = useToast();
-  const [selectedStartDateTime, setSelectedStartDateTime] = useState<Date>(() => {
-    try {
-      // Initialize with current time - 15 minutes as default (start time is in the past)
-      const date = new Date(initialTime);
-      date.setMinutes(date.getMinutes() - 15);
-      // Check if the date is valid
-      if (isNaN(date.getTime())) {
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - 15);
-        return now; // Fallback to current date - 15 min if invalid
-      }
-      return date;
-    } catch (error) {
-      console.error('Error parsing initialTime:', error);
-      const now = new Date();
-      now.setMinutes(now.getMinutes() - 15);
-      return now; // Fallback to current date - 15 min
-    }
-  });
-  
   const [selectedEndDateTime, setSelectedEndDateTime] = useState<Date>(() => {
     try {
       // Initialize with current time as default (end time is now)
@@ -85,9 +56,8 @@ export default function PumpForm({
     }
   });
   
+  const [durationMinutes, setDurationMinutes] = useState<string>('15');
   const [formData, setFormData] = useState({
-    startTime: initialTime,
-    endTime: '',
     leftAmount: '',
     rightAmount: '',
     totalAmount: '',
@@ -96,37 +66,10 @@ export default function PumpForm({
   });
   const [loading, setLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [initializedTime, setInitializedTime] = useState<string | null>(null);
 
-  // Handle start date/time change
-  const handleStartDateTimeChange = (date: Date) => {
-    setSelectedStartDateTime(date);
-    
-    // Also update the time in formData for compatibility with existing code
-    // Format the date as ISO string for storage in formData
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    
-    const formattedTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-    setFormData(prev => ({ ...prev, startTime: formattedTime }));
-  };
-  
   // Handle end date/time change
   const handleEndDateTimeChange = (date: Date) => {
     setSelectedEndDateTime(date);
-    
-    // Format the date as ISO string for storage in formData
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    
-    const formattedTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-    setFormData(prev => ({ ...prev, endTime: formattedTime }));
   };
 
   useEffect(() => {
@@ -134,47 +77,37 @@ export default function PumpForm({
       if (activity) {
         // Editing mode - populate with activity data
         try {
-          // Set the start date time
           const startDate = new Date(activity.startTime);
-          if (!isNaN(startDate.getTime())) {
-            setSelectedStartDateTime(startDate);
+          const endDateFromActivity = activity.endTime ? new Date(activity.endTime) : null;
+          let resolvedEndDate = endDateFromActivity && !isNaN(endDateFromActivity.getTime())
+            ? endDateFromActivity
+            : null;
+          if (!resolvedEndDate && activity.duration !== null && activity.duration !== undefined && !isNaN(startDate.getTime())) {
+            resolvedEndDate = new Date(startDate.getTime() + activity.duration * 60000);
           }
-          
-          // Set the end date time if it exists
-          if (activity.endTime) {
-            const endDate = new Date(activity.endTime);
-            if (!isNaN(endDate.getTime())) {
-              setSelectedEndDateTime(endDate);
-            }
+
+          if (!resolvedEndDate || isNaN(resolvedEndDate.getTime())) {
+            resolvedEndDate = !isNaN(startDate.getTime()) ? startDate : new Date(initialTime);
+          }
+
+          setSelectedEndDateTime(resolvedEndDate);
+
+          let resolvedDuration = activity.duration ?? undefined;
+          if ((resolvedDuration === null || resolvedDuration === undefined) && !isNaN(startDate.getTime())) {
+            resolvedDuration = Math.round((resolvedEndDate.getTime() - startDate.getTime()) / 60000);
+          }
+
+          if (resolvedDuration !== undefined && resolvedDuration !== null) {
+            setDurationMinutes(Math.max(resolvedDuration, 0).toString());
+          } else {
+            setDurationMinutes('');
           }
         } catch (error) {
           console.error('Error parsing activity times:', error);
+          setDurationMinutes('');
         }
-        
-        // Format the start date for the time property
-        const startDate = new Date(activity.startTime);
-        const startYear = startDate.getFullYear();
-        const startMonth = String(startDate.getMonth() + 1).padStart(2, '0');
-        const startDay = String(startDate.getDate()).padStart(2, '0');
-        const startHours = String(startDate.getHours()).padStart(2, '0');
-        const startMinutes = String(startDate.getMinutes()).padStart(2, '0');
-        const formattedStartTime = `${startYear}-${startMonth}-${startDay}T${startHours}:${startMinutes}`;
-        
-        // Format the end date for the time property if it exists
-        let formattedEndTime = '';
-        if (activity.endTime) {
-          const endDate = new Date(activity.endTime);
-          const endYear = endDate.getFullYear();
-          const endMonth = String(endDate.getMonth() + 1).padStart(2, '0');
-          const endDay = String(endDate.getDate()).padStart(2, '0');
-          const endHours = String(endDate.getHours()).padStart(2, '0');
-          const endMinutes = String(endDate.getMinutes()).padStart(2, '0');
-          formattedEndTime = `${endYear}-${endMonth}-${endDay}T${endHours}:${endMinutes}`;
-        }
-        
+
         setFormData({
-          startTime: formattedStartTime,
-          endTime: formattedEndTime,
           leftAmount: activity.leftAmount?.toString() || '',
           rightAmount: activity.rightAmount?.toString() || '',
           totalAmount: activity.totalAmount?.toString() || '',
@@ -206,41 +139,13 @@ export default function PumpForm({
         try {
           const date = new Date(initialTime);
           if (!isNaN(date.getTime())) {
-            // Set start time to 15 minutes in the past
-            const startDate = new Date(date);
-            startDate.setMinutes(startDate.getMinutes() - 15);
-            setSelectedStartDateTime(startDate);
-            
-            // Set end time to current time
             setSelectedEndDateTime(date);
-            
-            // Also update the times in formData
-            const startYear = startDate.getFullYear();
-            const startMonth = String(startDate.getMonth() + 1).padStart(2, '0');
-            const startDay = String(startDate.getDate()).padStart(2, '0');
-            const startHours = String(startDate.getHours()).padStart(2, '0');
-            const startMinutes = String(startDate.getMinutes()).padStart(2, '0');
-            const formattedStartTime = `${startYear}-${startMonth}-${startDay}T${startHours}:${startMinutes}`;
-            
-            const endYear = date.getFullYear();
-            const endMonth = String(date.getMonth() + 1).padStart(2, '0');
-            const endDay = String(date.getDate()).padStart(2, '0');
-            const endHours = String(date.getHours()).padStart(2, '0');
-            const endMinutes = String(date.getMinutes()).padStart(2, '0');
-            const formattedEndTime = `${endYear}-${endMonth}-${endDay}T${endHours}:${endMinutes}`;
-            
-            setFormData(prev => ({ 
-              ...prev, 
-              startTime: formattedStartTime,
-              endTime: formattedEndTime
-            }));
           }
         } catch (error) {
           console.error('Error parsing initialTime:', error);
         }
-        
-        // Store the initial time used for new entry
-        setInitializedTime(initialTime);
+
+        setDurationMinutes('15');
       }
       
       // Mark as initialized
@@ -248,7 +153,6 @@ export default function PumpForm({
     } else if (!isOpen) {
       // Reset initialization flag and stored time when form closes
       setIsInitialized(false);
-      setInitializedTime(null);
     }
   }, [isOpen, activity, initialTime]);
 
@@ -300,6 +204,13 @@ export default function PumpForm({
     }
   };
 
+  const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      setDurationMinutes(value);
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     
@@ -310,6 +221,12 @@ export default function PumpForm({
     }
   };
 
+  const parsedDuration = durationMinutes === '' ? null : Number(durationMinutes);
+  const durationMs = parsedDuration !== null && Number.isFinite(parsedDuration) && parsedDuration >= 0
+    ? Math.round(parsedDuration * 60000)
+    : null;
+  const durationPreview = durationMs !== null ? formatDuration(durationMs) : '';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -318,20 +235,67 @@ export default function PumpForm({
       return;
     }
     
+    if (isNaN(selectedEndDateTime.getTime())) {
+      showToast({
+        variant: 'error',
+        title: t('Error'),
+        message: t('Please enter an end time'),
+        duration: 5000,
+      });
+      return;
+    }
+
+    if (parsedDuration === null || !Number.isFinite(parsedDuration)) {
+      showToast({
+        variant: 'error',
+        title: t('Error'),
+        message: t('Please enter a valid duration'),
+        duration: 5000,
+      });
+      return;
+    }
+
+    if (parsedDuration <= 0) {
+      showToast({
+        variant: 'error',
+        title: t('Error'),
+        message: t('Duration must be greater than zero'),
+        duration: 5000,
+      });
+      return;
+    }
+
     setLoading(true);
     
     try {
-      // Calculate duration between start and end times
-      let duration: number | undefined = undefined;
-      duration = Math.round((selectedEndDateTime.getTime() - selectedStartDateTime.getTime()) / 60000); // Convert ms to minutes
-      
+      const duration = Math.round(parsedDuration);
+      const startDateTime = new Date(selectedEndDateTime.getTime() - duration * 60000);
+      if (isNaN(startDateTime.getTime())) {
+        showToast({
+          variant: 'error',
+          title: t('Error'),
+          message: t('Unable to calculate start time'),
+          duration: 5000,
+        });
+        return;
+      }
+
       // Convert local times to UTC ISO strings using the selectedDateTime objects
-      const utcStartTime = toUTCString(selectedStartDateTime);
+      const utcStartTime = toUTCString(startDateTime);
       
       // Convert end time to UTC
       const utcEndTime = toUTCString(selectedEndDateTime);
+      if (!utcStartTime || !utcEndTime) {
+        showToast({
+          variant: 'error',
+          title: t('Error'),
+          message: t('Unable to calculate start time'),
+          duration: 5000,
+        });
+        return;
+      }
       
-      console.log('Original start time (local):', selectedStartDateTime.toLocaleString());
+      console.log('Original start time (local):', startDateTime.toLocaleString());
       console.log('Converted start time (UTC):', utcStartTime);
       console.log('Original end time (local):', selectedEndDateTime.toLocaleString());
       console.log('Converted end time (UTC):', utcEndTime);
@@ -426,17 +390,6 @@ export default function PumpForm({
         <FormPageContent>
           <form onSubmit={handleSubmit}>
           <div className="space-y-4">
-            {/* Start Time Input */}
-            <div className="space-y-2">
-              <Label htmlFor="startTime">{t('Start Time')}</Label>
-              <DateTimePicker
-                value={selectedStartDateTime}
-                onChange={handleStartDateTimeChange}
-                disabled={loading}
-                placeholder={t("Select start time...")}
-              />
-            </div>
-            
             {/* End Time Input */}
             <div className="space-y-2">
               <Label htmlFor="endTime">{t('End Time')}</Label>
@@ -446,6 +399,30 @@ export default function PumpForm({
                 disabled={loading}
                 placeholder={t("Select end time...")}
               />
+            </div>
+
+            {/* Duration Input */}
+            <div className="space-y-2">
+              <Label htmlFor="durationMinutes">{t('Duration')}</Label>
+              <Input
+                id="durationMinutes"
+                name="durationMinutes"
+                type="number"
+                inputMode="decimal"
+                min="1"
+                step="1"
+                placeholder={t('Enter duration')}
+                value={durationMinutes}
+                onChange={handleDurationChange}
+                className="text-center text-lg"
+                disabled={loading}
+              />
+              {durationPreview ? (
+                <p className="text-sm text-muted-foreground">
+                  <span>{t('Duration preview')}</span>
+                  <span className="ml-1 font-medium">{durationPreview}</span>
+                </p>
+              ) : null}
             </div>
             
             {/* Unit Selection with Buttons - Moved above amount inputs */}

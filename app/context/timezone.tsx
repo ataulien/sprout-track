@@ -7,7 +7,8 @@ import {
   getDateTimePreferences,
   formatDate as formatDateWithPreferences,
   formatTime as formatTimeWithPreferences,
-  formatDateTime as formatDateTimeWithPreferences
+  formatDateTime as formatDateTimeWithPreferences,
+  formatDuration as formatDurationWithPreferences
 } from '@/src/lib/date-time';
 
 /**
@@ -55,9 +56,9 @@ interface TimezoneContextType {
   calculateDurationMinutes: (startIsoString: string | null | undefined, endIsoString: string | null | undefined) => number;
   
   /**
-   * Format a duration in minutes to a human-readable string (HH:MM)
+   * Format a duration in milliseconds to a human-readable string
    */
-  formatDuration: (minutes: number) => string;
+  formatDuration: (durationMs: number) => string;
   
   /**
    * Check if a date is today in the user's timezone
@@ -383,12 +384,14 @@ export function TimezoneProvider({ children }: { children: ReactNode }) {
   };
 
   /**
-   * Format a duration in minutes to a human-readable string (HH:MM)
+   * Format a duration in milliseconds to a human-readable string
    */
-  const formatDuration = (minutes: number): string => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}:${mins.toString().padStart(2, '0')}`;
+  const formatDuration = (durationMs: number): string => {
+    return formatDurationWithPreferences(durationMs, dateTimePreferences, {
+      locale,
+      timeZone: userTimezone,
+      language,
+    });
   };
 
   /**

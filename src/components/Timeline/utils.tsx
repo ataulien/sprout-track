@@ -19,7 +19,7 @@ import {
   ActivityDescription, 
   ActivityStyle 
 } from './types';
-import { formatDate, formatTime as formatTimeDisplay, getDateTimePreferences } from '@/src/lib/date-time';
+import { formatDate, formatTime as formatTimeDisplay, getDateTimePreferences, formatDuration as formatDurationDisplay } from '@/src/lib/date-time';
 
 export const getActivityIcon = (activity: ActivityType) => {
   if ('doseAmount' in activity && 'medicineId' in activity) {
@@ -122,9 +122,7 @@ export const formatTime = (date: string, settings: Settings | null, includeDate:
 };
 
 export const formatDuration = (minutes: number): string => {
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-  return `(${hours.toString().padStart(2, '0')}:${remainingMinutes.toString().padStart(2, '0')})`;
+  return `(${formatDurationDisplay(minutes * 60000)})`;
 };
 
 export const getActivityDetails = (activity: ActivityType, settings: Settings | null, t: (key: string) => string): ActivityDetails => {

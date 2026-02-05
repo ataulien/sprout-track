@@ -459,3 +459,37 @@ The `./scripts/env-update.sh` script automatically manages environment variables
   - Set to `"false"` to allow cookies on non-HTTPS connections (development or initial setup)
   - Set to `"true"` when you have an SSL certificate in place (recommended for production)
   - When set to `"true"`, the application will only work over HTTPS connections
+
+## Testing – Pumping Add Form
+
+### Manual test steps
+
+1. **Create a pump entry with a short duration (< 1 hour).**
+   - **Steps:** Open the pumping add form, select an end time, enter a duration like `20`, and save.
+   - **Expected:** The entry saves successfully, and the duration is displayed in minutes (e.g., `20 min`). The stored `startTime` equals `endTime - 20 minutes`.
+2. **Create a pump entry with a long duration (> 1 hour).**
+   - **Steps:** Open the pumping add form, select an end time, enter a duration like `90`, and save.
+   - **Expected:** The entry saves successfully, and the duration is displayed in `h:mm` format (e.g., `1:30`). The stored `startTime` equals `endTime - 90 minutes`.
+3. **Test with 24h time format.**
+   - **Steps:** Set user preferences to 24h time format. Open the pumping add form and select an end time.
+   - **Expected:** The end time picker and any displayed times show 24h format (e.g., `18:45`). Saving an entry keeps the calculated start time consistent.
+4. **Test with 12h time format.**
+   - **Steps:** Set user preferences to 12h time format. Open the pumping add form and select an end time.
+   - **Expected:** The end time picker and any displayed times show 12h format (e.g., `6:45 PM`). Saving an entry keeps the calculated start time consistent.
+5. **Verify start time calculation in storage.**
+   - **Steps:** After saving a pump entry, inspect the stored record (via the pump log list, export, or database).
+   - **Expected:** `startTime` equals `endTime - duration`, and `duration` matches the entered value in minutes.
+6. **Verify retro-compatibility with existing entries.**
+   - **Steps:** Open an existing pump entry created before this change.
+   - **Expected:** The form pre-populates end time and duration using existing `startTime`/`endTime` values, and saving preserves correct times.
+
+### Edge cases tested
+
+- **Duration is empty or non-numeric.**
+  - **Expected:** The form shows an error and does not submit.
+- **Duration is zero or negative.**
+  - **Expected:** The form shows an error and does not submit.
+- **End time is missing or invalid.**
+  - **Expected:** The form shows an error and does not submit.
+- **Duration causes start time to cross midnight.**
+  - **Expected:** The calculated `startTime` correctly shifts to the previous day without errors.

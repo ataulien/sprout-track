@@ -4,7 +4,8 @@ A form component for recording and editing breast pumping activities in the Baby
 
 ## Features
 
-- Records start and end times for pumping sessions
+- Records end time and duration for pumping sessions
+- Calculates start time automatically from end time and duration
 - Tracks left and right breast amounts separately with intuitive increment/decrement controls
 - Automatically calculates total amount based on left and right amounts
 - Supports different measurement units (oz, ml) with easy toggle buttons
@@ -69,8 +70,8 @@ Main component for recording breast pumping activities.
 
 The form includes the following fields:
 
-1. **Start Time**: When the pumping session began (required)
-2. **End Time**: When the pumping session ended (optional)
+1. **End Time**: When the pumping session ended (required)
+2. **Duration**: Length of the pumping session (required)
 3. **Left Amount**: Amount pumped from left breast with increment/decrement buttons (optional)
 4. **Right Amount**: Amount pumped from right breast with increment/decrement buttons (optional)
 5. **Total Amount**: Total amount pumped (calculated automatically)
@@ -79,7 +80,7 @@ The form includes the following fields:
 
 ## Behavior
 
-- When both start and end times are provided, the duration is automatically calculated
+- Start time is calculated automatically from end time and duration
 - When left and/or right amounts are entered, the total amount is automatically calculated
 - The form validates that amount fields contain valid numeric values
 - The form handles both creation of new records and editing of existing ones

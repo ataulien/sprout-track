@@ -105,6 +105,43 @@ export const formatDateTime = (
   return `${datePart} ${timePart}`;
 };
 
+const resolveLocale = (options?: DateTimeFormatOptions): string => {
+  if (options?.locale) return options.locale;
+  if (options?.language) {
+    if (options.language.toLowerCase().startsWith('fr')) return 'fr-FR';
+    if (options.language.toLowerCase().startsWith('es')) return 'es-ES';
+    return 'en-US';
+  }
+  if (typeof navigator !== 'undefined' && navigator.language) {
+    return navigator.language;
+  }
+  return 'en-US';
+};
+
+export const formatDuration = (
+  durationMs: number | null | undefined,
+  preferences?: DateTimePreferences | null,
+  options?: DateTimeFormatOptions
+): string => {
+  if (durationMs === null || durationMs === undefined) return '';
+  if (!Number.isFinite(durationMs)) return '';
+  if (durationMs < 0) return '';
+
+  const totalMinutes = Math.round(durationMs / 60000);
+  if (totalMinutes < 60) {
+    const locale = resolveLocale(options);
+    return new Intl.NumberFormat(locale, {
+      style: 'unit',
+      unit: 'minute',
+      unitDisplay: 'short',
+    }).format(totalMinutes);
+  }
+
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${hours}:${minutes.toString().padStart(2, '0')}`;
+};
+
 export const parseDateInput = (
   value: string | null | undefined,
   preferences?: DateTimePreferences | null,
