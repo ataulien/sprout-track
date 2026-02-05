@@ -8,8 +8,6 @@ type UnitData = {
   activityTypes?: string;
 };
 
-type SeedLocale = 'en' | 'fr';
-
 type SeedStrings = {
   defaultFamilyName: string;
   defaultFamilySlug: string;
@@ -80,12 +78,43 @@ const FR_UNIT_NAMES: Record<string, string> = {
   SUPPOSITORY: 'Suppositoire'
 };
 
-function getSeedLocale(): SeedLocale {
+const ES_UNIT_NAMES: Record<string, string> = {
+  OZ: 'Onzas',
+  ML: 'Mililitros',
+  TBSP: 'Cucharada',
+  LB: 'Libras',
+  IN: 'Pulgadas',
+  CM: 'Centímetros',
+  G: 'Gramos',
+  KG: 'Kilogramos',
+  F: 'Fahrenheit',
+  C: 'Celsius',
+  MG: 'Miligramos',
+  MCG: 'Microgramos',
+  L: 'Litros',
+  CC: 'Centímetros cúbicos',
+  MOL: 'Moles',
+  MMOL: 'Milimoles',
+  DROP: 'Gotas',
+  DOSE: 'Dosis',
+  PILL: 'Píldora',
+  CAP: 'Cápsula',
+  TAB: 'Tableta',
+  SPRAY: 'Spray',
+  INHALER: 'Inhalador',
+  INJECTION: 'Inyección',
+  PATCH: 'Parche',
+  CREAM: 'Crema',
+  OINTMENT: 'Pomada',
+  SUPPOSITORY: 'Supositorio'
+};
+
+function getSeedLocale(): string {
   const raw = process.env.SEED_LANGUAGE || process.env.SEED_LOCALE || 'en';
-  return raw.toLowerCase() === 'fr' ? 'fr' : 'en';
+  return raw.toLowerCase();
 }
 
-function getSeedStrings(locale: SeedLocale): SeedStrings {
+function getSeedStrings(locale: string): SeedStrings {
   if (locale === 'fr') {
     return {
       defaultFamilyName: 'Ma famille',
@@ -93,6 +122,15 @@ function getSeedStrings(locale: SeedLocale): SeedStrings {
       systemCaretakerName: 'Système',
       systemCaretakerType: 'Administrateur système',
       unitNames: FR_UNIT_NAMES
+    };
+  }
+  if (locale === 'es') {
+    return {
+      defaultFamilyName: 'Mi familia',
+      defaultFamilySlug: 'mi-familia',
+      systemCaretakerName: 'Sistema',
+      systemCaretakerType: 'Administrador del sistema',
+      unitNames: ES_UNIT_NAMES
     };
   }
   return {
