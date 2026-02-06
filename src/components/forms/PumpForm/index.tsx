@@ -56,7 +56,7 @@ export default function PumpForm({
     }
   });
   
-  const [durationMinutes, setDurationMinutes] = useState<string>('15');
+  const [durationMinutes, setDurationMinutes] = useState<string>('20');
   const [formData, setFormData] = useState({
     leftAmount: '',
     rightAmount: '',
@@ -145,7 +145,7 @@ export default function PumpForm({
           console.error('Error parsing initialTime:', error);
         }
 
-        setDurationMinutes('15');
+        setDurationMinutes('20');
       }
       
       // Mark as initialized
