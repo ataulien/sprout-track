@@ -690,7 +690,7 @@ const AccountSettingsTab: React.FC<AccountSettingsTabProps> = ({
                     value={passwordFormData.currentPassword}
                     onChange={(e) => setPasswordFormData(prev => ({ ...prev, currentPassword: e.target.value }))}
                     disabled={changingPasswordLoading}
-                    placeholder="Enter your current password"
+                    placeholder={t('Enter your current password')}
                   />
                 </div>
                 
@@ -707,7 +707,7 @@ const AccountSettingsTab: React.FC<AccountSettingsTabProps> = ({
                     ) : (
                       <>
                         <Key className="h-4 w-4 mr-2" />
-                        Continue
+                        {t('Continue')}
                       </>
                     )}
                   </Button>
@@ -740,7 +740,7 @@ const AccountSettingsTab: React.FC<AccountSettingsTabProps> = ({
                       updatePasswordValidation(newPassword);
                     }}
                     disabled={changingPasswordLoading}
-                    placeholder="Enter new password"
+                    placeholder={t('Enter new password')}
                   />
                 </div>
 
@@ -752,7 +752,7 @@ const AccountSettingsTab: React.FC<AccountSettingsTabProps> = ({
                     value={passwordFormData.confirmPassword}
                     onChange={(e) => setPasswordFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                     disabled={changingPasswordLoading}
-                    placeholder="Confirm new password"
+                    placeholder={t('Confirm new password')}
                   />
                 </div>
 
@@ -1314,7 +1314,7 @@ const AccountSettingsTab: React.FC<AccountSettingsTabProps> = ({
                 value={closurePasswordData.password}
                 onChange={(e) => setClosurePasswordData(prev => ({ ...prev, password: e.target.value }))}
                 disabled={closurePasswordLoading || closingAccount}
-                placeholder="Enter your password"
+                placeholder={t('Enter your password')}
               />
             </div>
             

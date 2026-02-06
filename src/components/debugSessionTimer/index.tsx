@@ -376,7 +376,7 @@ const DebugSessionTimer: React.FC<DebugSessionTimerProps> = () => {
         <button 
           className={debugTimerCloseButton()} 
           onClick={() => setIsVisible(false)}
-          aria-label="Close debug timer"
+          aria-label={t('Close debug timer')}
         >
           <X size={16} />
         </button>

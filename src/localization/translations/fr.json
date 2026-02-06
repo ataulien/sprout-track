@@ -1369,5 +1369,13 @@
   "Your Personal PIN (6-10 digits)": "Your Personal PIN (6-10 digits)",
   "Your Personal Profile": "Your Personal Profile",
   "and": "and",
-  "your-family-url": "your-family-url"
+  "your-family-url": "your-family-url",
+  "Account Manager": "Account Manager",
+  "Admin Password Reset": "Admin Password Reset",
+  "Close debug timer": "Close debug timer",
+  "Enter your current password": "Enter your current password",
+  "ID": "ID",
+  "Important security notice about your Family Manager password": "Important security notice about your Family Manager password",
+  "Error: Failed to download data": "Error: Failed to download data",
+  "Error: Failed to renew subscription": "Error: Failed to renew subscription"
 }

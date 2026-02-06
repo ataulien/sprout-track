@@ -100,7 +100,7 @@ export default function PinLogin({
               setActiveInput('pin');
               // Focus the PIN input for SYSTEM auth type
               setTimeout(() => {
-                const pinInput = document.querySelector('input[placeholder="PIN"]') as HTMLInputElement;
+                const pinInput = document.getElementById('pinInput') as HTMLInputElement;
                 if (pinInput) {
                   pinInput.focus();
                 }
@@ -129,7 +129,7 @@ export default function PinLogin({
       setActiveInput('pin');
       // Focus the PIN input after state update
       setTimeout(() => {
-        const pinInput = document.querySelector('input[placeholder="PIN"]') as HTMLInputElement;
+        const pinInput = document.getElementById('pinInput') as HTMLInputElement;
         if (pinInput) {
           pinInput.focus();
         }
@@ -148,8 +148,8 @@ export default function PinLogin({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     // Determine which field is actually focused based on the target element
     const target = e.target as HTMLInputElement;
-    const isLoginIdField = target.placeholder === 'ID';
-    const isPinField = target.placeholder === 'PIN';
+    const isLoginIdField = target.id === 'loginIdInput';
+    const isPinField = target.id === 'pinInput';
 
     // Allow only numbers, backspace, delete, arrow keys, tab, and enter
     const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab', 'Enter'];
@@ -172,7 +172,7 @@ export default function PinLogin({
         if (newLoginId.length === 2) {
           setActiveInput('pin');
           setTimeout(() => {
-            const pinInput = document.querySelector('input[placeholder="PIN"]') as HTMLInputElement;
+            const pinInput = document.getElementById('pinInput') as HTMLInputElement;
             if (pinInput) {
               pinInput.focus();
             }
@@ -200,7 +200,7 @@ export default function PinLogin({
         // Switch back to login ID if PIN is empty and there's content in login ID
         setActiveInput('loginId');
         setTimeout(() => {
-          const loginInput = document.querySelector('input[placeholder="ID"]') as HTMLInputElement;
+          const loginInput = document.getElementById('loginIdInput') as HTMLInputElement;
           if (loginInput) {
             loginInput.focus();
           }
@@ -214,7 +214,7 @@ export default function PinLogin({
       if (isLoginIdField) {
         setActiveInput('pin');
         setTimeout(() => {
-          const pinInput = document.querySelector('input[placeholder="PIN"]') as HTMLInputElement;
+          const pinInput = document.getElementById('pinInput') as HTMLInputElement;
           if (pinInput) {
             pinInput.focus();
           }
@@ -222,7 +222,7 @@ export default function PinLogin({
       } else if (isPinField) {
         setActiveInput('loginId');
         setTimeout(() => {
-          const loginInput = document.querySelector('input[placeholder="ID"]') as HTMLInputElement;
+          const loginInput = document.getElementById('loginIdInput') as HTMLInputElement;
           if (loginInput) {
             loginInput.focus();
           }
@@ -253,7 +253,7 @@ export default function PinLogin({
           setActiveInput('pin');
           // Focus the PIN input after state update
           setTimeout(() => {
-            const pinInput = document.querySelector('input[placeholder="PIN"]') as HTMLInputElement;
+            const pinInput = document.getElementById('pinInput') as HTMLInputElement;
             if (pinInput) {
               pinInput.focus();
             }
@@ -621,23 +621,25 @@ export default function PinLogin({
 
                 {/* Hidden inputs */}
                 <Input
+                  id="loginIdInput"
                   value={loginId}
                   onChange={handleLoginIdChange}
                   onKeyDown={handleKeyDown}
                   className="text-center text-xl sr-only"
-                  placeholder="ID"
+                  placeholder={t('ID')}
                   maxLength={2}
                   autoFocus={activeInput === 'loginId'}
                   onFocus={handleFocusLoginId}
                   disabled={!!lockoutTime}
                 />
                 <Input
+                  id="pinInput"
                   type="password"
                   value={pin}
                   onChange={handlePinChange}
                   onKeyDown={handleKeyDown}
                   className="text-center text-xl font-semibold sr-only"
-                  placeholder="PIN"
+                  placeholder={t('PIN')}
                   maxLength={10}
                   autoFocus={activeInput === 'pin'}
                   onFocus={handleFocusPin}
@@ -673,12 +675,13 @@ export default function PinLogin({
                   )}
                 </div>
                 <Input
+                  id="pinInput"
                   type="password"
                   value={pin}
                   onChange={handlePinChange}
                   onKeyDown={handleKeyDown}
                   className="text-center text-xl font-semibold sr-only"
-                  placeholder="PIN"
+                  placeholder={t('PIN')}
                   maxLength={10}
                   autoFocus={activeInput === 'pin'}
                   onFocus={handleFocusPin}
