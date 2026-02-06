@@ -101,12 +101,12 @@ const Reports: React.FC<ReportsProps> = ({ className }) => {
           }
         } else {
           setActivities([]);
-          setError('Failed to fetch activities');
+          setError(t('Failed to fetch activities'));
         }
       } catch (err) {
         console.error('Error fetching activities:', err);
         setActivities([]);
-        setError('Error fetching activities');
+        setError(t('Error fetching activities'));
       } finally {
         setIsLoading(false);
       }

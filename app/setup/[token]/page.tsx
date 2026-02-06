@@ -140,7 +140,7 @@ export default function SetupPageWithToken({ params }: SetupPageWithTokenProps) 
         setIsValidToken(true);
       } catch (error) {
         console.error('Error resolving params or setting up token page:', error);
-        setError('Failed to initialize setup page');
+        setError(t('Failed to initialize setup page'));
       } finally {
         setIsLoading(false);
       }
@@ -160,7 +160,7 @@ export default function SetupPageWithToken({ params }: SetupPageWithTokenProps) 
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>{!mounted ? 'Loading...' : 'Validating setup invitation...'}</p>
+          <p>{!mounted ? t('Loading...') : t('Validating setup invitation...')}</p>
         </div>
       </div>
     );

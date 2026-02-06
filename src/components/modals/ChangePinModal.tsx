@@ -48,7 +48,7 @@ export default function ChangePinModal({
             setHasCaretakers(hasActiveCaretakers);
             
             if (hasActiveCaretakers) {
-              setError('System PIN changes are disabled when caretakers exist. Use caretaker authentication instead.');
+              setError(t('System PIN changes are disabled when caretakers exist. Use caretaker authentication instead.'));
             }
           }
         } catch (error) {
@@ -64,7 +64,7 @@ export default function ChangePinModal({
 
   const handleVerifyPin = () => {
     if (hasCaretakers) {
-      setError('System PIN changes are disabled when caretakers exist. Use caretaker authentication instead.');
+      setError(t('System PIN changes are disabled when caretakers exist. Use caretaker authentication instead.'));
       return;
     }
     
@@ -72,23 +72,23 @@ export default function ChangePinModal({
       setStep('new');
       setError('');
     } else {
-      setError('Incorrect PIN');
+      setError(t('Incorrect PIN'));
       setVerifyPin('');
     }
   };
 
   const handleNewPin = () => {
     if (hasCaretakers) {
-      setError('System PIN changes are disabled when caretakers exist. Use caretaker authentication instead.');
+      setError(t('System PIN changes are disabled when caretakers exist. Use caretaker authentication instead.'));
       return;
     }
     
     if (newPin.length < 6) {
-      setError('PIN must be at least 6 digits');
+      setError(t('PIN must be at least 6 digits'));
       return;
     }
     if (newPin.length > 10) {
-      setError('PIN cannot be longer than 10 digits');
+      setError(t('PIN cannot be longer than 10 digits'));
       return;
     }
     setStep('confirm');
@@ -97,7 +97,7 @@ export default function ChangePinModal({
 
   const handleConfirmPin = () => {
     if (hasCaretakers) {
-      setError('System PIN changes are disabled when caretakers exist. Use caretaker authentication instead.');
+      setError(t('System PIN changes are disabled when caretakers exist. Use caretaker authentication instead.'));
       return;
     }
     
@@ -105,7 +105,7 @@ export default function ChangePinModal({
       onPinChange(newPin);
       handleClose();
     } else {
-      setError('PINs do not match');
+      setError(t('PINs do not match'));
       setConfirmPin('');
     }
   };
@@ -124,14 +124,14 @@ export default function ChangePinModal({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {step === 'verify' && 'Verify Current PIN'}
-            {step === 'new' && 'Enter New PIN'}
-            {step === 'confirm' && 'Confirm New PIN'}
+            {step === 'verify' && t('Verify Current PIN')}
+            {step === 'new' && t('Enter New PIN')}
+            {step === 'confirm' && t('Confirm New PIN')}
           </DialogTitle>
           <DialogDescription>
-            {step === 'verify' && 'Please enter your current PIN to continue'}
-            {step === 'new' && 'Enter a new PIN between 6-10 digits'}
-            {step === 'confirm' && 'Enter your new PIN again to confirm'}
+            {step === 'verify' && t('Please enter your current PIN to continue')}
+            {step === 'new' && t('Enter a new PIN between 6-10 digits')}
+            {step === 'confirm' && t('Enter your new PIN again to confirm')}
           </DialogDescription>
         </DialogHeader>
 
@@ -149,7 +149,7 @@ export default function ChangePinModal({
                     setError('');
                   }
                 }}
-                placeholder="Enter current PIN"
+                placeholder={t('Enter current PIN')}
                 pattern="\d*"
                 disabled={hasCaretakers || loading}
               />
@@ -171,7 +171,7 @@ export default function ChangePinModal({
                     }
                   }
                 }}
-                placeholder="Enter new PIN"
+                placeholder={t('Enter new PIN')}
                 minLength={6}
                 maxLength={10}
                 pattern="\d*"
@@ -196,7 +196,7 @@ export default function ChangePinModal({
                     }
                   }
                 }}
-                placeholder="Confirm new PIN"
+                placeholder={t('Confirm new PIN')}
                 minLength={6}
                 maxLength={10}
                 pattern="\d*"

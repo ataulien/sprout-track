@@ -268,7 +268,7 @@ export default function FamilySelectPage() {
                       onFocus={handleSearchFocus}
                       onKeyDown={handleKeyDown}
                       className="w-full pl-10 pr-10 family-select-input"
-                      placeholder="Search for your family..."
+                      placeholder={t('Search for your family...')}
                       disabled={loading}
                     />
                     <ChevronDown 
@@ -320,7 +320,7 @@ export default function FamilySelectPage() {
                         </div>
                       ) : (
                         <div className="px-4 py-3 text-sm text-gray-500 family-select-no-families">
-                          {searchTerm.trim() !== '' ? 'No families found' : 'No families available'}
+                          {searchTerm.trim() !== '' ? t('No families found') : t('No families available')}
                         </div>
                       )}
                     </div>

@@ -43,7 +43,7 @@ export default function BetaSubscriberView({
       <TableHeader>
         <TableRow>
           <TableHead>{t('Email')}</TableHead>
-          <TableHead>Name</TableHead>
+          <TableHead>{t('Name')}</TableHead>
           <TableHead>{t('Signed Up')}</TableHead>
           <TableHead>{t('Source')}</TableHead>
           <TableHead>{t('Status')}</TableHead>
@@ -71,7 +71,7 @@ export default function BetaSubscriberView({
                       : 'bg-yellow-100 text-yellow-800'
                   }`}
                 >
-                  {subscriber.isOptedIn ? 'Subscribed' : 'Opted Out'}
+                  {subscriber.isOptedIn ? t('Subscribed') : t('Opted Out')}
                 </span>
                 {subscriber.optedOutAt && (
                   <div className="text-xs text-gray-500 mt-1">
@@ -86,7 +86,7 @@ export default function BetaSubscriberView({
                     size="sm"
                     onClick={() => onUpdateSubscriber(subscriber.id, !subscriber.isOptedIn)}
                     disabled={updatingSubscriberId === subscriber.id}
-                    title={subscriber.isOptedIn ? 'Opt-out subscriber' : 'Opt-in subscriber'}
+                    title={subscriber.isOptedIn ? t('Opt-out subscriber') : t('Opt-in subscriber')}
                   >
                     {updatingSubscriberId === subscriber.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -101,7 +101,7 @@ export default function BetaSubscriberView({
                     size="sm"
                     onClick={() => onDeleteSubscriber(subscriber.id)}
                     disabled={deletingSubscriberId === subscriber.id}
-                    title="Delete subscriber"
+                    title={t('Delete subscriber')}
                   >
                     {deletingSubscriberId === subscriber.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />

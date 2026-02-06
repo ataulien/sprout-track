@@ -97,15 +97,15 @@ export default function CaretakerModal({
 
   const validatePIN = () => {
     if (formData.securityPin.length < 6) {
-      setError('PIN must be at least 6 digits');
+      setError(t('PIN must be at least 6 digits'));
       return false;
     }
     if (formData.securityPin.length > 10) {
-      setError('PIN cannot be longer than 10 digits');
+      setError(t('PIN cannot be longer than 10 digits'));
       return false;
     }
     if (formData.securityPin !== confirmPin) {
-      setError('PINs do not match');
+      setError(t('PINs do not match'));
       return false;
     }
     return true;
@@ -117,17 +117,17 @@ export default function CaretakerModal({
 
     // Validate form
     if (!formData.loginId.trim()) {
-      setError('Login ID is required');
+      setError(t('Login ID is required'));
       return;
     }
 
     if (formData.loginId.length !== 2) {
-      setError('Login ID must be exactly 2 characters');
+      setError(t('Login ID must be exactly 2 characters'));
       return;
     }
 
     if (!formData.name.trim()) {
-      setError('Name is required');
+      setError(t('Name is required'));
       return;
     }
 
@@ -196,7 +196,7 @@ export default function CaretakerModal({
                 setFormData({ ...formData, loginId: value });
               }}
               className="w-full"
-              placeholder="Enter 2-digit login ID"
+              placeholder={t('Enter 2-digit login ID')}
               maxLength={2}
               required
               autoComplete="off"
@@ -206,14 +206,14 @@ export default function CaretakerModal({
             </p>
           </div>
           <div>
-            <label className="form-label">Name</label>
+            <label className="form-label">{t('Name')}</label>
             <Input
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
               className="w-full"
-              placeholder="Enter caretaker name"
+              placeholder={t('Enter caretaker name')}
               required
             />
           </div>
@@ -225,7 +225,7 @@ export default function CaretakerModal({
                 setFormData({ ...formData, type: e.target.value })
               }
               className="w-full"
-              placeholder="Parent, Grandparent, Nanny, etc."
+              placeholder={t('Parent, Grandparent, Nanny, etc.')}
             />
           </div>
           <div>
@@ -238,7 +238,7 @@ export default function CaretakerModal({
               disabled={isFirstCaretaker}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a role" />
+                <SelectValue placeholder={t('Select a role')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="USER">{t('Regular User')}</SelectItem>
@@ -267,7 +267,7 @@ export default function CaretakerModal({
                 }
               }}
               className="w-full"
-              placeholder="Enter 6-10 digit PIN"
+              placeholder={t('Enter 6-10 digit PIN')}
               minLength={6}
               maxLength={10}
               pattern="\d*"
@@ -287,7 +287,7 @@ export default function CaretakerModal({
                 }
               }}
               className="w-full"
-              placeholder="Confirm PIN"
+              placeholder={t('Confirm PIN')}
               minLength={6}
               maxLength={10}
               pattern="\d*"

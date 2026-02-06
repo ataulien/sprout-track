@@ -106,7 +106,8 @@ export default function FamilyManagerLoginPage() {
         const remainingTime = ipCheckData.data.remainingTime || 300000;
         const remainingMinutes = Math.ceil(remainingTime / 60000);
         setLockoutTime(Date.now() + remainingTime);
-        setError(`Too many failed attempts. Please try again in ${remainingMinutes} minute${remainingMinutes > 1 ? 's' : ''}.`);
+        const minutesText = remainingMinutes > 1 ? t('minutes') : t('minute');
+        setError(`${t('Too many failed attempts. Please try again in')} ${remainingMinutes} ${minutesText}.`);
         return;
       }
 

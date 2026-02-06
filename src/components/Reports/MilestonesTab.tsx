@@ -65,11 +65,11 @@ const MilestonesTab: React.FC<MilestonesTabProps> = () => {
             setError(data.message || 'Failed to fetch milestones');
           }
         } else {
-          setError('Failed to fetch milestones');
+          setError(t('Failed to fetch milestones'));
         }
       } catch (err) {
         console.error('Error fetching milestones:', err);
-        setError('Error fetching milestones');
+        setError(t('Error fetching milestones'));
       } finally {
         setIsLoading(false);
       }

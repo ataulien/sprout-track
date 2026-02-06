@@ -59,7 +59,7 @@ export default function AccountView({
       <TableHeader>
         <TableRow>
           <TableHead>{t('Email')}</TableHead>
-          <TableHead>Name</TableHead>
+          <TableHead>{t('Name')}</TableHead>
           <TableHead>{t('Created')}</TableHead>
           <TableHead>{t('Family')}</TableHead>
           <TableHead>{t('Verified')}</TableHead>
@@ -81,7 +81,7 @@ export default function AccountView({
               <TableCell>
                 {account.firstName || account.lastName ? 
                   `${account.firstName || ''} ${account.lastName || ''}`.trim() : 
-                  'N/A'
+                  t('N/A')
                 }
               </TableCell>
               <TableCell className="text-sm">{formatDateTime(account.createdAt)}</TableCell>
@@ -92,7 +92,7 @@ export default function AccountView({
                     <div className="text-xs text-gray-500">/{account.family.slug}</div>
                   </div>
                 ) : (
-                  'No family'
+                  t('No family')
                 )}
               </TableCell>
               <TableCell>
@@ -122,7 +122,7 @@ export default function AccountView({
                       : 'bg-red-100 text-red-800'
                   }`}
                 >
-                  {!account.closed ? 'Active' : 'Closed'}
+                  {!account.closed ? t('Active') : t('Closed')}
                 </span>
                 {account.closedAt && (
                   <div className="text-xs text-gray-500 mt-1">
@@ -137,7 +137,7 @@ export default function AccountView({
                     size="sm"
                     onClick={() => onUpdateAccount(account.id, !account.closed)}
                     disabled={updatingAccountId === account.id}
-                    title={account.closed ? 'Reinstate account' : 'Close account'}
+                    title={account.closed ? t('Reinstate account') : t('Close account')}
                   >
                     {updatingAccountId === account.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />

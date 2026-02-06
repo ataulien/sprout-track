@@ -162,11 +162,11 @@ const home = () => {
   const validateEmail = (emailValue: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailValue) {
-      setEmailError('Email is required');
+      setEmailError(t('Email is required'));
       return false;
     }
     if (!emailRegex.test(emailValue)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError(t('Please enter a valid email address'));
       return false;
     }
     setEmailError('');
@@ -195,7 +195,7 @@ const home = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to sign up');
+        throw new Error(data.error || t('Failed to sign up'));
       }
       
       // Success - show success message
@@ -210,7 +210,7 @@ const home = () => {
       }, 10000);
     } catch (error) {
       console.error('Error submitting signup:', error);
-      alert('There was an error signing up. Please try again.');
+      alert(t('There was an error signing up. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -232,7 +232,7 @@ const home = () => {
             </div>
             <div className="flex items-center gap-2">
               <AccountButton 
-                label="Sign Up" 
+                label={t('Sign Up')} 
                 showIcon={false}
                 variant="link"
                 initialMode="register"
@@ -243,7 +243,7 @@ const home = () => {
                 hideWhenLoggedIn={true}
               />
               <AccountButton 
-                label="Sign In" 
+                label={t('Sign In')} 
                 showIcon={false} 
                 initialMode="login"
                 onOpenAccountModal={(mode) => {

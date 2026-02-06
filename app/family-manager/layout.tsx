@@ -162,7 +162,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
           <button
             onClick={handleLogout}
             className="family-manager-logout-button"
-            aria-label="Logout from family manager"
+            aria-label={t('Logout from family manager')}
           >
             <LogOut className="family-manager-logout-icon" />
             {t('Logout')}

@@ -90,7 +90,7 @@ export default function FeedbackView({
     const data = await response.json();
 
     if (!data.success) {
-      throw new Error(data.error || 'Failed to send reply');
+      throw new Error(data.error || t('Failed to send reply'));
     }
 
     // Refresh the feedback list to get updated data
@@ -136,17 +136,17 @@ export default function FeedbackView({
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">
                   {!feedback.viewed && (
-                    <div className="w-2 h-2 feedback-view-unread-indicator bg-blue-500 rounded-full" title="Unread" />
+                    <div className="w-2 h-2 feedback-view-unread-indicator bg-blue-500 rounded-full" title={t('Unread')} />
                   )}
                   <button
                     onClick={() => handleSubjectClick(feedback)}
                     className="feedback-view-subject-link text-left hover:text-blue-600 hover:underline cursor-pointer flex items-center gap-2"
-                    title="Click to view full message"
+                    title={t('Click to view full message')}
                   >
                     <span>{feedback.subject}</span>
                     {feedback.replies && feedback.replies.length > 0 && (
                       <span className="feedback-view-reply-badge text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-                        {feedback.replies.length} {feedback.replies.length === 1 ? 'reply' : 'replies'}
+                        {feedback.replies.length} {feedback.replies.length === 1 ? t('reply') : t('replies')}
                       </span>
                     )}
                   </button>
@@ -157,7 +157,7 @@ export default function FeedbackView({
                   <div className="flex items-center gap-1">
                     <User className="h-3 w-3 feedback-view-icon text-gray-400" />
                     <span className="font-medium feedback-view-submitter-name">
-                      {feedback.submitterName || 'Anonymous'}
+                      {feedback.submitterName || t('Anonymous')}
                     </span>
                   </div>
                   {feedback.submitterEmail && (
@@ -182,7 +182,7 @@ export default function FeedbackView({
                   if (hasUnread) {
                     return (
                       <span className="feedback-view-unread-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                        {unreadCount} {unreadCount === 1 ? 'unread' : 'unread'}
+                        {unreadCount} {t('unread')}
                       </span>
                     );
                   }
@@ -210,7 +210,7 @@ export default function FeedbackView({
                     size="sm"
                     onClick={() => onUpdateFeedback(feedback.id, !feedback.viewed)}
                     disabled={updatingFeedbackId === feedback.id}
-                    title={feedback.viewed ? 'Mark as unread' : 'Mark as read'}
+                    title={feedback.viewed ? t('Mark as unread') : t('Mark as read')}
                   >
                     {updatingFeedbackId === feedback.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />

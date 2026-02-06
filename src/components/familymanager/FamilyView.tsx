@@ -78,7 +78,7 @@ export default function FamilyView({
       <TableHeader>
         <TableRow>
           <TableHead>{t('Family Name')}</TableHead>
-          <TableHead>Link/Slug</TableHead>
+          <TableHead>{t('Link/Slug')}</TableHead>
           <TableHead>{t('Created')}</TableHead>
           <TableHead>{t('Updated')}</TableHead>
           <TableHead>{t('Status')}</TableHead>
@@ -154,7 +154,7 @@ export default function FamilyView({
                           : 'bg-gray-100 text-gray-800'
                       }`}
                     >
-                      {family.isActive ? 'Active' : 'Inactive'}
+                      {family.isActive ? t('Active') : t('Inactive')}
                     </span>
                   )}
                 </TableCell>
@@ -191,7 +191,7 @@ export default function FamilyView({
                           variant="outline"
                           size="sm"
                           onClick={() => onEdit(family)}
-                          title="Edit family"
+                          title={t('Edit family')}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -199,7 +199,7 @@ export default function FamilyView({
                           variant="outline"
                           size="sm"
                           onClick={() => onViewCaretakers(family)}
-                          title="View caretakers"
+                          title={t('View caretakers')}
                         >
                           <Users className="h-4 w-4" />
                         </Button>
@@ -215,7 +215,7 @@ export default function FamilyView({
                           variant="outline"
                           size="sm"
                           onClick={() => onLogin(family)}
-                          title="Login to family"
+                          title={t('Login to family')}
                         >
                           <LogIn className="h-4 w-4" />
                         </Button>

@@ -63,7 +63,7 @@ export default function AccountFamilySetupPage() {
             
             // Check if user is verified
             if (!status.verified) {
-              setError('Please verify your email address before setting up your family.');
+              setError(t('Please verify your email address before setting up your family.'));
               setIsLoading(false);
               return;
             }
@@ -79,7 +79,7 @@ export default function AccountFamilySetupPage() {
             setAccountStatus(status);
             setIsLoading(false);
           } else {
-            setError('Failed to verify account status.');
+            setError(t('Failed to verify account status.'));
             setIsLoading(false);
           }
         } else {
@@ -90,7 +90,7 @@ export default function AccountFamilySetupPage() {
         }
       } catch (error) {
         console.error('Error checking account status:', error);
-        setError('Network error. Please check your connection.');
+        setError(t('Network error. Please check your connection.'));
         setIsLoading(false);
       }
     };
@@ -134,7 +134,7 @@ export default function AccountFamilySetupPage() {
               </Link>
               <MobileMenu>
                 <AccountButton 
-                  label="Sign In" 
+                  label={t('Sign In')} 
                   showIcon={false} 
                   initialMode="login"
                   className="saas-account-btn" 
@@ -247,7 +247,7 @@ export default function AccountFamilySetupPage() {
               </Link>
               <MobileMenu>
                 <AccountButton 
-                  label="Sign In" 
+                  label={t('Sign In')} 
                   showIcon={false} 
                   initialMode="login"
                   className="saas-account-btn" 

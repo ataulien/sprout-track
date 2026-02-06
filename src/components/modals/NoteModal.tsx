@@ -209,7 +209,7 @@ export default function NoteModal({
                       setShowDropdown(true);
                     }}
                     className="w-full"
-                    placeholder="Type or select a category"
+                    placeholder={t('Type or select a category')}
                     onKeyDown={(e) => {
                       const visibleCategories = categories.filter(category =>
                         category.toLowerCase().includes(formData.category.toLowerCase())
@@ -266,7 +266,7 @@ export default function NoteModal({
                   setFormData({ ...formData, content: e.target.value })
                 }
                 className="w-full min-h-[100px] resize-none"
-                placeholder="Enter your note here..."
+                placeholder={t('Enter your note here...')}
                 required
               />
             </div>

@@ -474,11 +474,11 @@ export default function FamilyManagerPage() {
         await fetchInvites(); // Refresh the invites list
       } else {
         console.error('Failed to delete invite:', data.error);
-        alert('Failed to delete invite: ' + data.error);
+        alert(`${t('Failed to delete invite:')} ${data.error}`);
       }
     } catch (error) {
       console.error('Error deleting invite:', error);
-      alert('Error deleting invite');
+      alert(t('Error deleting invite'));
     } finally {
       setDeletingInviteId(null);
     }
@@ -488,7 +488,7 @@ export default function FamilyManagerPage() {
   const saveFamily = async (family: FamilyData) => {
     // Don't save if there's a slug error
     if (slugError) {
-      alert('Please fix the slug error before saving');
+      alert(t('Please fix the slug error before saving'));
       return;
     }
 
@@ -518,11 +518,11 @@ export default function FamilyManagerPage() {
         setSlugError('');
       } else {
         console.error('Failed to save family:', data.error);
-        alert('Failed to save changes: ' + data.error);
+        alert(`${t('Failed to save changes:')} ${data.error}`);
       }
     } catch (error) {
       console.error('Error saving family:', error);
-      alert('Error saving changes');
+      alert(t('Error saving changes'));
     } finally {
       setSaving(false);
     }
@@ -548,11 +548,11 @@ export default function FamilyManagerPage() {
             fetchBetaSubscribers();
           } else {
             console.error('Failed to update subscriber:', data.error);
-            alert('Failed to update subscriber: ' + data.error);
+            alert(`${t('Failed to update subscriber:')} ${data.error}`);
           }
         } catch (error) {
           console.error('Error updating subscriber:', error);
-          alert('Error updating subscriber');
+          alert(t('Error updating subscriber'));
         } finally {
           setUpdatingSubscriberId(null);
         }
@@ -560,7 +560,7 @@ export default function FamilyManagerPage() {
 
         // Delete subscriber
   const deleteSubscriber = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this subscriber? This action is permanent.')) {
+    if (!window.confirm(t('Are you sure you want to delete this subscriber? This action is permanent.'))) {
         return;
       }
     try {
@@ -579,11 +579,11 @@ export default function FamilyManagerPage() {
         fetchBetaSubscribers();
       } else {
         console.error('Failed to delete subscriber:', data.error);
-        alert('Failed to delete subscriber: ' + data.error);
+        alert(`${t('Failed to delete subscriber:')} ${data.error}`);
       }
     } catch (error) {
       console.error('Error deleting subscriber:', error);
-      alert('Error deleting subscriber');
+      alert(t('Error deleting subscriber'));
     } finally {
       setDeletingSubscriberId(null);
     }
@@ -640,7 +640,7 @@ export default function FamilyManagerPage() {
 
   // Format date/time for display
   const formatDateTimeForDisplay = (dateString: string | null) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return t('N/A');
     return formatDateTime(dateString);
   };
 
@@ -684,11 +684,11 @@ export default function FamilyManagerPage() {
         fetchAccounts();
       } else {
         console.error('Failed to update account:', data.error);
-        alert('Failed to update account: ' + data.error);
+        alert(`${t('Failed to update account:')} ${data.error}`);
       }
     } catch (error) {
       console.error('Error updating account:', error);
-      alert('Error updating account');
+      alert(t('Error updating account'));
     } finally {
       setUpdatingAccountId(null);
     }
@@ -714,11 +714,11 @@ export default function FamilyManagerPage() {
         fetchFeedback();
       } else {
         console.error('Failed to update feedback:', data.error);
-        alert('Failed to update feedback: ' + data.error);
+        alert(`${t('Failed to update feedback:')} ${data.error}`);
       }
     } catch (error) {
       console.error('Error updating feedback:', error);
-      alert('Error updating feedback');
+      alert(t('Error updating feedback'));
     } finally {
       setUpdatingFeedbackId(null);
     }
@@ -749,14 +749,38 @@ export default function FamilyManagerPage() {
     fetchData();
   }, [isSaasMode]);
 
-  const emptyMessageNoun = useMemo(() => {
+  const emptyMessages = useMemo(() => {
     switch(activeTab) {
-        case 'families': return 'families';
-        case 'invites': return 'invites';
-        case 'accounts': return 'accounts';
-        case 'beta': return 'data';
-        case 'feedback': return 'feedback';
-        default: return 'data';
+      case 'families':
+        return {
+          default: 'No families found.',
+          search: 'No families found matching your search.',
+        };
+      case 'invites':
+        return {
+          default: 'No invites found.',
+          search: 'No invites found matching your search.',
+        };
+      case 'accounts':
+        return {
+          default: 'No accounts found.',
+          search: 'No accounts found matching your search.',
+        };
+      case 'beta':
+        return {
+          default: 'No data found.',
+          search: 'No data found matching your search.',
+        };
+      case 'feedback':
+        return {
+          default: 'No feedback found.',
+          search: 'No feedback found matching your search.',
+        };
+      default:
+        return {
+          default: 'No data found.',
+          search: 'No data found matching your search.',
+        };
     }
   }, [activeTab]);
 
@@ -794,11 +818,11 @@ export default function FamilyManagerPage() {
           value={searchTerm}
           onSearchChange={setSearchTerm}
           placeholder={
-            activeTab === 'families' ? "Search families by name or slug..." :
-            activeTab === 'invites' ? "Search invites by token, creator, or family..." :
-            activeTab === 'accounts' ? "Search accounts by email, name, or family..." :
-            activeTab === 'feedback' ? "Search feedback by subject, message, or submitter..." :
-            "Search subscribers by email or name..."
+            activeTab === 'families' ? t('Search families by name or slug...') :
+            activeTab === 'invites' ? t('Search invites by token, creator, or family...') :
+            activeTab === 'accounts' ? t('Search accounts by email, name, or family...') :
+            activeTab === 'feedback' ? t('Search feedback by subject, message, or submitter...') :
+            t('Search subscribers by email or name...')
           }
         />
 
@@ -866,7 +890,7 @@ export default function FamilyManagerPage() {
         {/* Empty state for when no data matches search */}
         {paginatedData.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            {searchTerm ? `No ${emptyMessageNoun} found matching your search.` : `No ${emptyMessageNoun} found.`}
+            {searchTerm ? t(emptyMessages.search) : t(emptyMessages.default)}
           </div>
         )}
 
@@ -906,8 +930,8 @@ export default function FamilyManagerPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t('Login ID')}</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Type</TableHead>
+                    <TableHead>{t('Name')}</TableHead>
+                    <TableHead>{t('Type')}</TableHead>
                     <TableHead>{t('Role')}</TableHead>
                     <TableHead>{t('Status')}</TableHead>
                   </TableRow>
@@ -917,7 +941,7 @@ export default function FamilyManagerPage() {
                     <TableRow key={caretaker.id}>
                       <TableCell className="font-mono">{caretaker.loginId}</TableCell>
                       <TableCell>{caretaker.name}</TableCell>
-                      <TableCell>{caretaker.type || 'N/A'}</TableCell>
+                      <TableCell>{caretaker.type || t('N/A')}</TableCell>
                       <TableCell>{caretaker.role}</TableCell>
                       <TableCell>
                         <span
@@ -927,7 +951,7 @@ export default function FamilyManagerPage() {
                               : 'bg-gray-100 text-gray-800'
                           }`}
                         >
-                          {!caretaker.inactive ? 'Active' : 'Inactive'}
+                          {!caretaker.inactive ? t('Active') : t('Inactive')}
                         </span>
                       </TableCell>
                     </TableRow>

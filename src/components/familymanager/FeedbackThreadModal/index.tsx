@@ -193,7 +193,7 @@ export default function FeedbackThreadModal({
       }
     } catch (error) {
       console.error('Error sending reply:', error);
-      alert('An unexpected error occurred. Please try again.');
+      alert(t('An unexpected error occurred. Please try again.'));
     } finally {
       setSendingReply(false);
     }
@@ -229,7 +229,7 @@ export default function FeedbackThreadModal({
                   <div className="flex items-center gap-2 flex-wrap">
                     <User className="h-3 w-3 sm:h-4 sm:w-4 feedback-thread-replies-icon text-gray-400 flex-shrink-0" />
                     <span className="font-medium feedback-thread-submitter-name text-gray-900">
-                      {feedback.submitterName || 'Anonymous'}
+                      {feedback.submitterName || t('Anonymous')}
                     </span>
                     {feedback.submitterEmail && (
                       <span className="feedback-thread-submitter-email-text feedback-thread-meta-text text-gray-500 break-all">
@@ -282,7 +282,7 @@ export default function FeedbackThreadModal({
                         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-2">
                           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
                             <span className="font-medium feedback-thread-reply-name text-gray-900">
-                              {reply.submitterName || 'Admin'}
+                              {reply.submitterName || t('Admin')}
                             </span>
                             {reply.submitterEmail && (
                               <span className="feedback-thread-submitter-email-text feedback-thread-meta-text text-xs text-gray-500 break-all">
@@ -302,7 +302,7 @@ export default function FeedbackThreadModal({
                                 onUpdateFeedback(reply.id, !isRead);
                               }}
                               disabled={updatingFeedbackId === reply.id}
-                              title={isRead ? "Mark as unread" : "Mark as read"}
+                              title={isRead ? t('Mark as unread') : t('Mark as read')}
                               className="h-7 text-xs self-start sm:self-auto"
                             >
                               {updatingFeedbackId === reply.id ? (
@@ -352,7 +352,7 @@ export default function FeedbackThreadModal({
                   <Textarea
                     value={replyMessage}
                     onChange={(e) => setReplyMessage(e.target.value)}
-                    placeholder="Type your reply here..."
+                    placeholder={t('Type your reply here...')}
                     rows={5}
                     className="bg-white text-sm"
                   />
@@ -411,8 +411,8 @@ export default function FeedbackThreadModal({
               ) : (
                 <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               )}
-              <span className="hidden sm:inline">{t('Mark as')} {feedback.viewed ? 'Unread' : 'Read'}</span>
-              <span className="sm:hidden">{feedback.viewed ? 'Unread' : 'Read'}</span>
+              <span className="hidden sm:inline">{t('Mark as')} {feedback.viewed ? t('Unread') : t('Read')}</span>
+              <span className="sm:hidden">{feedback.viewed ? t('Unread') : t('Read')}</span>
             </Button>
           )}
           

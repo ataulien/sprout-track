@@ -52,7 +52,7 @@ function PaymentSuccessContent() {
   useEffect(() => {
     const verifySession = async () => {
       if (!sessionId) {
-        setVerificationError('No session ID provided');
+        setVerificationError(t('No session ID provided'));
         setVerifying(false);
         return;
       }
@@ -71,11 +71,11 @@ function PaymentSuccessContent() {
         const data = await response.json();
 
         if (!data.success) {
-          setVerificationError(data.error || 'Failed to verify payment');
+          setVerificationError(data.error || t('Failed to verify payment'));
         }
       } catch (error) {
         console.error('Error verifying session:', error);
-        setVerificationError('Failed to verify payment');
+        setVerificationError(t('Failed to verify payment'));
       } finally {
         setVerifying(false);
       }

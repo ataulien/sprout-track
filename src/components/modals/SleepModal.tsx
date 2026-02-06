@@ -273,7 +273,7 @@ export default function SleepModal({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="form-label">Type</label>
+              <label className="form-label">{t('Type')}</label>
               <Select
                 value={formData.type}
                 onValueChange={(value: SleepType) =>
