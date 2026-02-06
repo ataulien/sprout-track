@@ -158,12 +158,12 @@ const FamilySetupStage: React.FC<FamilySetupStageProps> = ({
   return (
     <div className={cn(styles.stageContainer, "setup-wizard-stage-container")}>
       <h2 className={cn(styles.stageTitle, "setup-wizard-stage-title")}>
-        {token ? 'Create Your Family' : 'Create Your Family'}
+        {t('Create Your Family')}
       </h2>
       <p className={cn(styles.stageDescription, "setup-wizard-stage-description")}>
         {token 
-          ? 'You\'ve been invited to create a new family. Let\'s get started with some basic information.' 
-          : 'Let\'s get started with some basic information.'
+          ? t("You've been invited to create a new family. Let's get started with some basic information.") 
+          : t("Let's get started with some basic information.")
         }
       </p>
       
@@ -178,7 +178,7 @@ const FamilySetupStage: React.FC<FamilySetupStageProps> = ({
           id="familyName"
           value={familyName}
           onChange={(e) => setFamilyName(e.target.value)}
-          placeholder="Enter family name"
+          placeholder={t('Enter family name')}
           className={cn(styles.formInput, "setup-wizard-form-input")}
         />
       </div>
@@ -198,7 +198,7 @@ const FamilySetupStage: React.FC<FamilySetupStageProps> = ({
                 value={familySlug}
                 onChange={(e) => setFamilySlug(e.target.value.toLowerCase())}
                 onFocus={handleSlugFieldFocus}
-                placeholder="family-url"
+                placeholder={t('family-url')}
                 className={cn(
                   styles.formInput,
                   "setup-wizard-form-input",
@@ -212,7 +212,7 @@ const FamilySetupStage: React.FC<FamilySetupStageProps> = ({
               onClick={generateSlug}
               disabled={generatingSlug}
               className="px-3"
-              title="Generate random URL"
+              title={t('Generate random URL')}
             >
               {generatingSlug ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -225,7 +225,7 @@ const FamilySetupStage: React.FC<FamilySetupStageProps> = ({
           {/* URL Preview */}
           <div className="text-sm text-gray-600 dark:text-gray-400">
             {t('Your family will be accessible at:')} <span className="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">
-              /{familySlug || 'your-family-url'}
+              /{familySlug || t('your-family-url')}
             </span>
           </div>
           

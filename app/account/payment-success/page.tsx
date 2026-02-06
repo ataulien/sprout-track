@@ -182,7 +182,7 @@ function PaymentSuccessContent() {
                   </div>
                 </div>
                 <p className="text-teal-700 font-medium mb-3">
-                  {t('Redirecting to home in')} {countdown} second{countdown !== 1 ? 's' : ''}...
+                  {t('Redirecting to home in')} {countdown} {countdown !== 1 ? t('seconds') : t('second')}...
                 </p>
                 <div className="w-full bg-teal-200 rounded-full h-3">
                   <div

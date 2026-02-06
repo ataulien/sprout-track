@@ -60,7 +60,7 @@ const BabySetupStage: React.FC<BabySetupStageProps> = ({
             id="babyFirstName"
             value={babyFirstName}
             onChange={(e) => setBabyFirstName(e.target.value)}
-            placeholder="First name"
+            placeholder={t('First name')}
             className={cn(styles.formInput, "setup-wizard-form-input")}
           />
         </div>
@@ -75,7 +75,7 @@ const BabySetupStage: React.FC<BabySetupStageProps> = ({
             id="babyLastName"
             value={babyLastName}
             onChange={(e) => setBabyLastName(e.target.value)}
-            placeholder="Last name"
+            placeholder={t('Last name')}
             className={cn(styles.formInput, "setup-wizard-form-input")}
           />
         </div>
@@ -101,7 +101,7 @@ const BabySetupStage: React.FC<BabySetupStageProps> = ({
               )}
             >
               <Calendar className="mr-2 h-4 w-4" />
-              {babyBirthDate ? format(babyBirthDate, "PPP") : "Select date"}
+              {babyBirthDate ? format(babyBirthDate, "PPP") : t('Select date')}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
@@ -131,7 +131,7 @@ const BabySetupStage: React.FC<BabySetupStageProps> = ({
             id="babyGender"
             className={cn(styles.formSelect, "setup-wizard-form-select")}
           >
-            <SelectValue placeholder="Select gender" />
+            <SelectValue placeholder={t('Select gender')} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="MALE">{t('Male')}</SelectItem>

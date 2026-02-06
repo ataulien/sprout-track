@@ -68,7 +68,7 @@ const TimelineFilter = ({
           size="icon"
           onClick={() => onDateChange(-1)}
           className="h-7 w-7 text-white hover:bg-transparent hover:text-white/90 p-0 -ml-2"
-          aria-label="Previous day"
+          aria-label={t('Previous day')}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -103,7 +103,7 @@ const TimelineFilter = ({
           size="icon"
           onClick={() => onDateChange(1)}
           className="h-7 w-7 text-white hover:bg-transparent hover:text-white/90 p-0"
-          aria-label="Next day"
+          aria-label={t('Next day')}
         >
           <ChevronRight className="h-4 w-4" />
         </Button>

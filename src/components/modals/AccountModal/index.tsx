@@ -106,24 +106,24 @@ export default function AccountModal({
   // Password validation - 8+ chars, lowercase, uppercase, numbers, special characters
   const validatePassword = (password: string): { isValid: boolean; message?: string } => {
     if (password.length < 8) {
-      return { isValid: false, message: 'Password must be at least 8 characters long' };
+      return { isValid: false, message: t('Password must be at least 8 characters long') };
     }
     
     if (!/[a-z]/.test(password)) {
-      return { isValid: false, message: 'Password must contain at least one lowercase letter' };
+      return { isValid: false, message: t('Password must contain at least one lowercase letter') };
     }
     
     if (!/[A-Z]/.test(password)) {
-      return { isValid: false, message: 'Password must contain at least one uppercase letter' };
+      return { isValid: false, message: t('Password must contain at least one uppercase letter') };
     }
     
     if (!/[0-9]/.test(password)) {
-      return { isValid: false, message: 'Password must contain at least one number' };
+      return { isValid: false, message: t('Password must contain at least one number') };
     }
     
     // SQL-safe special characters
     if (!/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)) {
-      return { isValid: false, message: 'Password must contain at least one special character (!@#$%^&*()_+-=[]{}|;:,.<>?)' };
+      return { isValid: false, message: t('Password must contain at least one special character (!@#$%^&*()_+-=[]{}|;:,.<>?)') };
     }
     
     return { isValid: true };
@@ -146,7 +146,7 @@ export default function AccountModal({
 
     // Validate email
     if (!validateEmail(formData.email)) {
-      setError('Please enter a valid email address');
+      setError(t('Please enter a valid email address'));
       return;
     }
 
@@ -159,14 +159,14 @@ export default function AccountModal({
     // Validate password for login and register modes
     const passwordValidation = validatePassword(formData.password);
     if (!passwordValidation.isValid) {
-      setError(passwordValidation.message || 'Invalid password');
+      setError(passwordValidation.message || t('Invalid password'));
       return;
     }
 
     if (mode === 'register') {
       // Validate required fields for registration
       if (!formData.firstName.trim()) {
-        setError('First name is required');
+        setError(t('First name is required'));
         return;
       }
 
@@ -195,7 +195,7 @@ export default function AccountModal({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
+        throw new Error(data.error || t('Registration failed'));
       }
 
       // Show success message
@@ -223,7 +223,7 @@ export default function AccountModal({
 
     } catch (error) {
       console.error('Registration error:', error);
-      setError(error instanceof Error ? error.message : 'Registration failed. Please try again.');
+      setError(error instanceof Error ? error.message : t('Registration failed. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -284,11 +284,11 @@ export default function AccountModal({
         window.location.reload();
         
       } else {
-        setError(result.error || 'Login failed. Please try again.');
+        setError(result.error || t('Login failed. Please try again.'));
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError('Network error. Please check your connection and try again.');
+      setError(t('Network error. Please check your connection and try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -300,12 +300,12 @@ export default function AccountModal({
       setError('');
 
       if (!formData.email.trim()) {
-        setError('Please enter your email address');
+        setError(t('Please enter your email address'));
         return;
       }
 
       if (!validateEmail(formData.email)) {
-        setError('Please enter a valid email address');
+        setError(t('Please enter a valid email address'));
         return;
       }
 
@@ -345,11 +345,11 @@ export default function AccountModal({
           onClose();
         }, 3000);
       } else {
-        setError(result.error || 'Failed to send reset email. Please try again.');
+        setError(result.error || t('Failed to send reset email. Please try again.'));
       }
     } catch (error) {
       console.error('Forgot password error:', error);
-      setError('Network error. Please check your connection and try again.');
+      setError(t('Network error. Please check your connection and try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -377,7 +377,7 @@ export default function AccountModal({
   const handleVerification = async (token: string) => {
     if (!token) {
       setVerificationState('error');
-      setVerificationMessage('Verification token is missing from the URL.');
+      setVerificationMessage(t('Verification token is missing from the URL.'));
       return;
     }
 
@@ -395,7 +395,7 @@ export default function AccountModal({
 
       if (response.ok && data.success) {
         setVerificationState('success');
-        setVerificationMessage(data.data.message || 'Account verified successfully!');
+        setVerificationMessage(data.data.message || t('Account verified successfully!'));
         
         // Start countdown to login
         setVerificationCountdown(3);
@@ -415,12 +415,12 @@ export default function AccountModal({
         }, 1000);
       } else {
         setVerificationState('error');
-        setVerificationMessage(data.error || 'Verification failed');
+        setVerificationMessage(data.error || t('Verification failed'));
       }
     } catch (err) {
       console.error('Verification error:', err);
       setVerificationState('error');
-      setVerificationMessage('Network error. Please check your connection and try again.');
+      setVerificationMessage(t('Network error. Please check your connection and try again.'));
     }
   };
 
@@ -428,7 +428,7 @@ export default function AccountModal({
   const handlePasswordReset = async (token: string) => {
     if (!token) {
       setResetState('invalid');
-      setResetMessage('Reset token is missing from the URL.');
+      setResetMessage(t('Reset token is missing from the URL.'));
       return;
     }
 
@@ -443,16 +443,16 @@ export default function AccountModal({
           setUserEmail(data.data.email || '');
         } else {
           setResetState('invalid');
-          setResetMessage('Invalid or expired reset token.');
+          setResetMessage(t('Invalid or expired reset token.'));
         }
       } else {
         setResetState('invalid');
-        setResetMessage(data.error || 'Token validation failed');
+        setResetMessage(data.error || t('Token validation failed'));
       }
     } catch (err) {
       console.error('Token validation error:', err);
       setResetState('error');
-      setResetMessage('Network error. Please check your connection and try again.');
+      setResetMessage(t('Network error. Please check your connection and try again.'));
     }
   };
 
@@ -464,12 +464,12 @@ export default function AccountModal({
     // Validate passwords
     const passwordValidation = validatePassword(formData.password);
     if (!passwordValidation.isValid) {
-      setError(passwordValidation.message || 'Invalid password');
+      setError(passwordValidation.message || t('Invalid password'));
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('Passwords do not match'));
       return;
     }
 
@@ -517,7 +517,7 @@ export default function AccountModal({
     } catch (err) {
       console.error('Password reset error:', err);
       setResetState('error');
-      setResetMessage('Network error. Please check your connection and try again.');
+      setResetMessage(t('Network error. Please check your connection and try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -584,7 +584,7 @@ export default function AccountModal({
                   : mode === 'register'
                   ? 'Start your 14 day trial and experience Sprout Track'
                   : mode === 'verify'
-                  ? 'Verifying your email address...'
+                  ? t('Verifying your email address...')
                   : mode === 'reset-password'
                   ? 'Reset your account password'
                   : 'Enter your email to receive a password reset link'
@@ -764,7 +764,7 @@ export default function AccountModal({
                           setFormData({ ...formData, password: newPassword });
                           updatePasswordValidation(newPassword);
                         }}
-                        placeholder="Enter new password"
+                        placeholder={t('Enter new password')}
                         className="w-full"
                         required
                         disabled={isSubmitting}
@@ -778,7 +778,7 @@ export default function AccountModal({
                         type="password"
                         value={formData.confirmPassword}
                         onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                        placeholder="Confirm new password"
+                        placeholder={t('Confirm new password')}
                         className="w-full"
                         required
                         disabled={isSubmitting}
@@ -835,7 +835,7 @@ export default function AccountModal({
                       className="account-modal-submit"
                       disabled={isSubmitting}
                     >
-                      {isSubmitting ? 'Resetting Password...' : 'Reset Password'}
+                      {isSubmitting ? t('Resetting Password...') : t('Reset Password')}
                     </Button>
                   </form>
                 </div>
@@ -932,7 +932,7 @@ export default function AccountModal({
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="Enter your email"
+                  placeholder={t('Enter your email')}
                   className="w-full"
                   required
                   disabled={isSubmitting}
@@ -953,7 +953,7 @@ export default function AccountModal({
                         updatePasswordValidation(newPassword);
                       }
                     }}
-                    placeholder="Enter your password"
+                    placeholder={t('Enter your password')}
                     className="w-full"
                     required
                     disabled={isSubmitting}
@@ -1008,7 +1008,7 @@ export default function AccountModal({
                         type="text"
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                        placeholder="First name"
+                        placeholder={t('First name')}
                         className="w-full"
                         required
                         disabled={isSubmitting}
@@ -1020,7 +1020,7 @@ export default function AccountModal({
                         type="text"
                         value={formData.lastName}
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                        placeholder="Last name"
+                        placeholder={t('Last name')}
                         className="w-full"
                         disabled={isSubmitting}
                       />
@@ -1043,8 +1043,8 @@ export default function AccountModal({
                 disabled={isSubmitting}
               >
                 {isSubmitting 
-                  ? (mode === 'login' ? 'Signing in...' : mode === 'register' ? 'Creating account...' : 'Sending email...') 
-                  : (mode === 'login' ? 'Sign In' : mode === 'register' ? 'Create Account' : 'Send Reset Email')
+                  ? (mode === 'login' ? t('Signing in...') : mode === 'register' ? t('Creating account...') : t('Sending email...')) 
+                  : (mode === 'login' ? t('Sign In') : mode === 'register' ? t('Create Account') : t('Send Reset Email'))
                 }
               </Button>
 
@@ -1077,7 +1077,7 @@ export default function AccountModal({
                       >
                         {t('Privacy Policy')}
                       </button>
-                      <span className="text-gray-400">and</span>
+                      <span className="text-gray-400">{t('and')}</span>
                       <button
                         type="button"
                         onClick={() => setShowTermsOfUse(true)}

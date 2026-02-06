@@ -102,24 +102,24 @@ const SetupWizard: React.FC<SetupWizardProps> = ({ onComplete, token, initialSet
     if (stage === 1) {
       // Validate family name and slug
       if (!familyName.trim()) {
-        setError('Please enter a family name');
+        setError(t('Please enter a family name'));
         return;
       }
 
       if (!familySlug.trim()) {
-        setError('Please enter a family URL');
+        setError(t('Please enter a family URL'));
         return;
       }
 
       // Basic slug validation
       const slugPattern = /^[a-z0-9-]+$/;
       if (!slugPattern.test(familySlug)) {
-        setError('Family URL can only contain lowercase letters, numbers, and hyphens');
+        setError(t('Family URL can only contain lowercase letters, numbers, and hyphens'));
         return;
       }
 
       if (familySlug.length < 3) {
-        setError('Family URL must be at least 3 characters long');
+        setError(t('Family URL must be at least 3 characters long'));
         return;
       }
       
@@ -147,7 +147,7 @@ const SetupWizard: React.FC<SetupWizardProps> = ({ onComplete, token, initialSet
         }
       } catch (error) {
         console.error('Error creating family:', error);
-        setError('Failed to create family. Please try again.');
+        setError(t('Failed to create family. Please try again.'));
       } finally {
         setLoading(false);
       }
@@ -155,12 +155,12 @@ const SetupWizard: React.FC<SetupWizardProps> = ({ onComplete, token, initialSet
       // Validate security setup
       if (useSystemPin) {
         if (systemPin.length < 6 || systemPin.length > 10) {
-          setError('PIN must be between 6 and 10 digits');
+          setError(t('PIN must be between 6 and 10 digits'));
           return;
         }
         
         if (systemPin !== confirmSystemPin) {
-          setError('PINs do not match');
+          setError(t('PINs do not match'));
           return;
         }
         
@@ -207,14 +207,14 @@ const SetupWizard: React.FC<SetupWizardProps> = ({ onComplete, token, initialSet
           setStage(3);
         } catch (error) {
           console.error('Error saving security PIN:', error);
-          setError('Failed to save security PIN. Please try again.');
+          setError(t('Failed to save security PIN. Please try again.'));
         } finally {
           setLoading(false);
         }
       } else {
         // Validate caretakers
         if (caretakers.length === 0) {
-          setError('Please add at least one caretaker');
+          setError(t('Please add at least one caretaker'));
           return;
         }
         
@@ -246,7 +246,7 @@ const SetupWizard: React.FC<SetupWizardProps> = ({ onComplete, token, initialSet
           setStage(3);
         } catch (error) {
           console.error('Error saving caretakers:', error);
-          setError('Failed to save caretakers. Please try again.');
+          setError(t('Failed to save caretakers. Please try again.'));
         } finally {
           setLoading(false);
         }
@@ -254,22 +254,22 @@ const SetupWizard: React.FC<SetupWizardProps> = ({ onComplete, token, initialSet
     } else if (stage === 3) {
       // Validate baby information
       if (!babyFirstName.trim()) {
-        setError('Please enter baby\'s first name');
+        setError(t("Please enter baby's first name"));
         return;
       }
       
       if (!babyLastName.trim()) {
-        setError('Please enter baby\'s last name');
+        setError(t("Please enter baby's last name"));
         return;
       }
       
       if (!babyBirthDate) {
-        setError('Please enter baby\'s birth date');
+        setError(t("Please enter baby's birth date"));
         return;
       }
       
       if (!babyGender) {
-        setError('Please select baby\'s gender');
+        setError(t("Please select baby's gender"));
         return;
       }
       
@@ -475,35 +475,35 @@ const SetupWizard: React.FC<SetupWizardProps> = ({ onComplete, token, initialSet
   const addCaretaker = () => {
     // Validate caretaker
     if (newCaretaker.loginId.length !== 2) {
-      setError('Login ID must be exactly 2 digits');
+      setError(t('Login ID must be exactly 2 digits'));
       return;
     }
     
     // Check if login ID contains only digits
     if (!/^\d+$/.test(newCaretaker.loginId)) {
-      setError('Login ID must contain only digits');
+      setError(t('Login ID must contain only digits'));
       return;
     }
     
     // Check if login ID is "00" (reserved)
     if (newCaretaker.loginId === '00') {
-      setError('Login ID "00" is reserved for system use');
+      setError(t('Login ID "00" is reserved for system use'));
       return;
     }
     
     // Check if login ID is already taken
     if (caretakers.some(c => c.loginId === newCaretaker.loginId)) {
-      setError('This Login ID is already taken');
+      setError(t('This Login ID is already taken'));
       return;
     }
     
     if (!newCaretaker.name.trim()) {
-      setError('Please enter caretaker name');
+      setError(t('Please enter caretaker name'));
       return;
     }
     
     if (newCaretaker.securityPin.length < 6 || newCaretaker.securityPin.length > 10) {
-      setError('PIN must be between 6 and 10 digits');
+      setError(t('PIN must be between 6 and 10 digits'));
       return;
     }
     
