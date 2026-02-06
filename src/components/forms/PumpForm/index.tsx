@@ -346,8 +346,8 @@ export default function PumpForm({
         const data = await response.json();
         showToast({
           variant: 'error',
-          title: 'Error',
-          message: data.error || 'Failed to save pump log',
+          title: t('Error'),
+          message: data.error || t('Failed to save pump log'),
           duration: 5000,
         });
         return;
@@ -362,8 +362,8 @@ export default function PumpForm({
       } else {
         showToast({
           variant: 'error',
-          title: 'Error',
-          message: data.error || 'Failed to save pump log',
+          title: t('Error'),
+          message: data.error || t('Failed to save pump log'),
           duration: 5000,
         });
       }
@@ -371,8 +371,8 @@ export default function PumpForm({
       console.error('Error saving pump log:', error);
       showToast({
         variant: 'error',
-        title: 'Error',
-        message: 'An unexpected error occurred. Please try again.',
+        title: t('Error'),
+        message: t('An unexpected error occurred. Please try again.'),
         duration: 5000,
       });
     } finally {

@@ -244,7 +244,7 @@
   "Data export": "Exportar datos",
   "data. This action cannot be undone. Please download your data first if you want to keep it.": "datos. Esta acción no se puede deshacer. Por favor descargue sus datos primero si desea conservarlos.",
   "Date": "Fecha",
-  "Date & Time": "Fecha y Hora",
+  "Date & Time": "Fecha y hora",
   "Date Range:": "Rango de Fechas:",
   "Date:": "Fecha:",
   "Days": "Días",
@@ -1178,7 +1178,6 @@
   "Your feedback helps us improve the app. Please be as specific as possible about any issues or suggestions you have.": "Sus comentarios nos ayudan a mejorar la aplicación. Por favor sea lo más específico posible sobre cualquier problema o sugerencia que tenga.",
   "Your payment was cancelled. No charges were made to your account.": "Su pago fue cancelado. No se realizaron cargos a su cuenta.",
   "Your payment was processed, but we encountered an issue activating your account. Please contact support or try logging out and back in.": "Su pago fue procesado, pero encontramos un problema al activar su cuenta. Por favor contacte al soporte o intente cerrar sesión y volver a iniciar sesión.",
-  "Date & Time": "Fecha y hora",
   "Time Format": "Formato de hora",
   "Date Format": "Formato de fecha",
   "Choose how times are displayed": "Elige cómo se muestran las horas",
@@ -1190,5 +1189,7 @@
   "DD/MM/YYYY": "DD/MM/YYYY",
   "MM/DD/YYYY": "MM/DD/YYYY",
   "YYYY-MM-DD": "YYYY-MM-DD",
-  "Yesterday": "Ayer"
+  "Yesterday": "Ayer",
+  "Failed to save pump log": "No se pudo guardar el registro de extracción",
+  "An unexpected error occurred. Please try again.": "Ocurrió un error inesperado. Inténtelo de nuevo."
 }
