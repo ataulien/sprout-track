@@ -969,6 +969,7 @@
   "Setup Method": "Méthode de Configuration",
   "Setup Password": "Mot de Passe de Configuration",
   "Setup token not found": "Jeton de configuration introuvable",
+  "Shampoo": "Shampoing",
   "Shampoo Only": "Shampoing Seulement",
   "Shampoo Used": "Shampoing Utilisé",
   "Share this link with the family to let them complete their setup:": "Partagez ce lien avec la famille pour leur permettre de compléter leur configuration :",
@@ -995,6 +996,7 @@
   "smtp.example.com": "smtp.exemple.com",
   "SMTP2GO": "SMTP2GO",
   "SMTP2GO API Key": "Clé API SMTP2GO",
+  "Soap": "Savon",
   "Soap Used": "Savon Utilisé",
   "Social & Emotional": "Social et Émotionnel",
   "Solid Feeding": "Alimentation Solide",
@@ -1379,7 +1381,5 @@
   "Error: Failed to download data": "Error: Failed to download data",
   "Error: Failed to renew subscription": "Error: Failed to renew subscription",
   "of": "of",
-  "Soap": "Soap",
-  "Shampoo": "Shampoo",
   "Total": "Total"
 }

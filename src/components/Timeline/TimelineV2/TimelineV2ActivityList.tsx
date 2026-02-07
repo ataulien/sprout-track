@@ -47,11 +47,11 @@ const TimelineV2ActivityList = ({
 
   const getTimeOfDayLabel = (timeOfDay: string): string => {
     switch (timeOfDay) {
-      case 'early-morning': return 'Early Morning';
-      case 'morning': return 'Morning';
-      case 'afternoon': return 'Afternoon';
-      case 'evening': return 'Evening';
-      case 'night': return 'Night';
+      case 'early-morning': return t('Early Morning');
+      case 'morning': return t('Morning');
+      case 'afternoon': return t('Afternoon');
+      case 'evening': return t('Evening');
+      case 'night': return t('Night');
       default: return timeOfDay;
     }
   };
@@ -289,7 +289,7 @@ const TimelineV2ActivityList = ({
                                     
                                     if ('amount' in activity) {
                                       if (activity.type === 'BREAST') {
-                                        const side = activity.side ? activity.side.charAt(0) + activity.side.slice(1).toLowerCase() : '';
+                                        const side = t(activity.side) ? t(activity.side.charAt(0) + activity.side.slice(1).toLowerCase()) : '';
                                         let duration = '';
                                         if (activity.feedDuration) {
                                           const minutes = Math.floor(activity.feedDuration / 60);
@@ -298,7 +298,7 @@ const TimelineV2ActivityList = ({
                                         } else if (activity.amount) {
                                           duration = `${activity.amount} min`;
                                         }
-                                        const parts = [side ? `${side} ${t('Side')}` : '', duration].filter(Boolean);
+                                        const parts = [side ? `${side}` : '', duration].filter(Boolean);
                                         if ((activity as any).notes) {
                                           const notes = (activity as any).notes;
                                           const truncatedNotes = notes.length > 30 ? notes.substring(0, 30) + '...' : notes;
@@ -340,10 +340,10 @@ const TimelineV2ActivityList = ({
                                     if ('condition' in activity) {
                                       const details = [];
                                       if (activity.condition) {
-                                        details.push(activity.condition.charAt(0) + activity.condition.slice(1).toLowerCase());
+                                        details.push(t(activity.condition.charAt(0) + activity.condition.slice(1).toLowerCase()));
                                       }
                                       if (activity.color) {
-                                        details.push(activity.color.charAt(0) + activity.color.slice(1).toLowerCase());
+                                        details.push(t(activity.color.charAt(0) + activity.color.slice(1).toLowerCase()));
                                       }
                                       if (activity.blowout) {
                                         details.push(t('Blowout/Leakage'));
