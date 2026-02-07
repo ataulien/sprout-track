@@ -324,7 +324,7 @@ const TimelineV2ActivityList = ({
                                         const food = activity.food ? activity.food : '';
                                         const parts = [];
                                         if (food) {
-                                          parts.push(`${activity.amount} ${unit} of ${food}`);
+                                          parts.push(`${activity.amount} ${unit} ${t('of')} ${food}`);
                                         } else {
                                           parts.push(`${activity.amount} ${unit}`);
                                         }
@@ -346,7 +346,7 @@ const TimelineV2ActivityList = ({
                                         details.push(activity.color.charAt(0) + activity.color.slice(1).toLowerCase());
                                       }
                                       if (activity.blowout) {
-                                        details.push('Blowout/Leakage');
+                                        details.push(t('Blowout/Leakage'));
                                       }
                                       return details.length > 0 ? details.join(' • ') : t('Diaper');
                                     }
@@ -359,9 +359,9 @@ const TimelineV2ActivityList = ({
                                     
                                     if ('soapUsed' in activity) {
                                       const details = [];
-                                      if (activity.soapUsed) details.push('Soap');
-                                      if (activity.shampooUsed) details.push('Shampoo');
-                                      if (details.length === 0) details.push('Water only');
+                                      if (activity.soapUsed) details.push(t('Soap'));
+                                      if (activity.shampooUsed) details.push(t('Shampoo'));
+                                      if (details.length === 0) details.push(t('Water only'));
                                       if (activity.notes) {
                                         const notes = activity.notes.length > 30 ? 
                                           activity.notes.substring(0, 30) + '...' : 
@@ -369,6 +369,15 @@ const TimelineV2ActivityList = ({
                                         details.push(notes);
                                       }
                                       return details.join(' • ');
+                                    }
+                                    
+                                    if ('leftAmount' in activity || 'rightAmount' in activity) {
+                                      const amounts = [];
+                                      const unit = ((activity as any).unit || 'oz').toLowerCase();
+                                      if ((activity as any).leftAmount) amounts.push(`${t('Left')}: ${(activity as any).leftAmount} ${unit}`);
+                                      if ((activity as any).rightAmount) amounts.push(`${t('Right')}: ${(activity as any).rightAmount} ${unit}`);
+                                      if ((activity as any).totalAmount) amounts.push(`${t('Total')}: ${(activity as any).totalAmount} ${unit}`);
+                                      return amounts.join(' • ');
                                     }
                                     
                                     if ('title' in activity && 'category' in activity) {
@@ -392,14 +401,14 @@ const TimelineV2ActivityList = ({
                                     if ('doseAmount' in activity && 'medicineId' in activity) {
                                       const unit = activity.unitAbbr ? activity.unitAbbr.toLowerCase() : '';
                                       const dose = activity.doseAmount ? `${activity.doseAmount} ${unit}`.trim() : '';
-                                      let medName = 'Medicine';
+                                      let medName = t('Medicine');
                                       if ('medicine' in activity && activity.medicine && typeof activity.medicine === 'object' && 'name' in activity.medicine) {
                                         medName = (activity.medicine as { name?: string }).name || medName;
                                       }
                                       return `${medName} - ${dose}`;
                                     }
                                     
-                                    return 'Activity logged';
+                                    return t('Activity logged');
                                   })()}
                                 </div>
                               </div>

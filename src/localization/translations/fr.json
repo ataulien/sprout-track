@@ -1377,5 +1377,9 @@
   "ID": "ID",
   "Important security notice about your Family Manager password": "Important security notice about your Family Manager password",
   "Error: Failed to download data": "Error: Failed to download data",
-  "Error: Failed to renew subscription": "Error: Failed to renew subscription"
+  "Error: Failed to renew subscription": "Error: Failed to renew subscription",
+  "of": "of",
+  "Soap": "Soap",
+  "Shampoo": "Shampoo",
+  "Total": "Total"
 }
