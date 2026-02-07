@@ -1381,5 +1381,10 @@
   "Error: Failed to download data": "Error: Failed to download data",
   "Error: Failed to renew subscription": "Error: Failed to renew subscription",
   "of": "of",
-  "Total": "Total"
+  "Total": "Total",
+  "Minutes": "Minutes",
+  "Period": "Période",
+  "Select hour": "Sélectionner l'heure",
+  "Select minute": "Sélectionner les minutes",
+  "Select period": "Sélectionner AM/PM"
 }

@@ -14,6 +14,7 @@ import {
   PopoverTrigger,
 } from '@/src/components/ui/popover';
 import { useTimezone } from '@/app/context/timezone';
+import { useLocalization } from '@/src/context/localization';
 
 // Import types and styles
 import { DateTimePickerProps } from './date-time-picker.types';
@@ -47,6 +48,7 @@ export function DateTimePicker({
   placeholder = "Select date and time...",
 }: DateTimePickerProps) {
   const { formatDateOnly, formatTime } = useTimezone();
+  const { t } = useLocalization();
   // Allow for null date value
   const [date, setDate] = useState<Date | null>(() => {
     // Check if value is a valid Date
@@ -107,14 +109,14 @@ export function DateTimePicker({
   
   // Format the date for display
   const formatDate = (date: Date | null): string => {
-    if (!date || !isValid(date)) return 'Select date';
-    return formatDateOnly(date.toISOString()) || 'Select date';
+    if (!date || !isValid(date)) return t('Select date');
+    return formatDateOnly(date.toISOString()) || t('Select date');
   };
   
   // Format the time for display
   const formatTimeLabel = (date: Date | null): string => {
-    if (!date || !isValid(date)) return 'Select time';
-    return formatTime(date.toISOString()) || 'Select time';
+    if (!date || !isValid(date)) return t('Select time');
+    return formatTime(date.toISOString()) || t('Select time');
   };
   
   // The time popover will now close when clicking outside, removing the need for a "Done" button.

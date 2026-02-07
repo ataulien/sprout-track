@@ -105,6 +105,51 @@ export const formatDateTime = (
   return `${datePart} ${timePart}`;
 };
 
+
+export interface ParsedTimeInput {
+  hours24: number;
+  minutes: number;
+  period: 'AM' | 'PM';
+}
+
+export const parseTimeInput = (
+  value: string | null | undefined,
+  preferences?: DateTimePreferences | null,
+  _options?: DateTimeFormatOptions
+): ParsedTimeInput | null => {
+  if (!value) return null;
+
+  const normalized = value.trim().toUpperCase().replace(/ /g, ' ');
+  const match = normalized.match(/(\d{1,2})\s*[:.]\s*(\d{2})\s*(AM|PM)?/);
+  if (!match) return null;
+
+  const rawHour = Number(match[1]);
+  const minutes = Number(match[2]);
+  const suffix = match[3] as 'AM' | 'PM' | undefined;
+  const { timeFormat } = getDateTimePreferences(preferences);
+
+  if (!Number.isInteger(rawHour) || !Number.isInteger(minutes) || minutes < 0 || minutes > 59) {
+    return null;
+  }
+
+  if (timeFormat === '12h' || suffix) {
+    if (rawHour < 1 || rawHour > 12) return null;
+    const period: 'AM' | 'PM' = suffix ?? 'AM';
+    const hours24 = period === 'PM'
+      ? (rawHour === 12 ? 12 : rawHour + 12)
+      : (rawHour === 12 ? 0 : rawHour);
+
+    return { hours24, minutes, period };
+  }
+
+  if (rawHour < 0 || rawHour > 23) return null;
+
+  return {
+    hours24: rawHour,
+    minutes,
+    period: rawHour >= 12 ? 'PM' : 'AM',
+  };
+};
 const resolveLocale = (options?: DateTimeFormatOptions): string => {
   if (options?.locale) return options.locale;
   if (options?.language) {

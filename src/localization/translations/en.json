@@ -1381,5 +1381,10 @@
   "of": "of",
   "Soap": "Soap",
   "Shampoo": "Shampoo",
-  "Total": "Total"
+  "Total": "Total",
+  "Minutes": "Minutes",
+  "Period": "Period",
+  "Select hour": "Select hour",
+  "Select minute": "Select minute",
+  "Select period": "Select period"
 }

@@ -493,3 +493,50 @@ The `./scripts/env-update.sh` script automatically manages environment variables
   - **Expected:** The form shows an error and does not submit.
 - **Duration causes start time to cross midnight.**
   - **Expected:** The calculated `startTime` correctly shifts to the previous day without errors.
+
+## Testing – TimePicker Double Dropdown Migration
+
+### Écrans impactés
+
+- Alimentation (`FeedForm`)
+- Tire-lait (`PumpForm`)
+- Sommeil (`SleepForm`)
+- Couches (`DiaperForm`)
+- Bain (`BathForm`)
+- Notes (`NoteForm`)
+- Mesures (`MeasurementForm`)
+- Jalons (`MilestoneForm`)
+- Médicaments (`GiveMedicineForm`, `MedicineForm/GiveMedicineTab`)
+- Événements calendrier (`CalendarEventForm`)
+
+> Tous ces écrans partagent le même `DateTimePicker`, qui délègue la saisie horaire à `TimeEntry`.
+
+### Protocole de test manuel
+
+1. **Tester en format 24h**
+   - **Étapes :** Configurer le format horaire utilisateur sur `24h`, ouvrir chaque écran impacté et sélectionner une heure via les dropdowns Heures + Minutes.
+   - **Résultat attendu :** Les heures disponibles sont `00` à `23`, le champ AM/PM n’apparaît pas, et la valeur affichée est cohérente dans tout l’écran.
+
+2. **Tester en format 12h**
+   - **Étapes :** Configurer le format horaire utilisateur sur `12h`, ouvrir chaque écran impacté.
+   - **Résultat attendu :** Les heures affichées sont `01` à `12`, un sélecteur AM/PM est visible, et la valeur affichée suit le format 12h.
+
+3. **Tester le changement AM/PM**
+   - **Étapes :** En 12h, sélectionner `12:00 AM`, `12:00 PM`, puis basculer AM/PM sur une autre heure (ex. `08:30`).
+   - **Résultat attendu :** La conversion interne est correcte (`12:00 AM` = `00:00`, `12:00 PM` = `12:00`) sans décaler la date.
+
+4. **Tester la navigation clavier**
+   - **Étapes :** Utiliser `Tab`, `Shift+Tab`, `↑`, `↓`, `Home`, `End` dans les dropdowns.
+   - **Résultat attendu :** La navigation clavier fonctionne sans blocage, les labels ARIA sont présents, et la valeur se met à jour immédiatement.
+
+5. **Tester responsive/mobile**
+   - **Étapes :** Vérifier sur viewport mobile (ex. 390x844) et desktop.
+   - **Résultat attendu :** Les dropdowns restent lisibles, empilés correctement, et manipulables au touch.
+
+6. **Tester stockage backend correct**
+   - **Étapes :** Créer/éditer des entrées sur les écrans impactés, puis vérifier les données sauvegardées (timeline/API/DB).
+   - **Résultat attendu :** Les timestamps restent ISO/UTC compatibles backend, sans régression de timezone.
+
+7. **Tester cas limites horaires**
+   - **Étapes :** Valider `00:00`, `12:00 AM`, `12:00 PM`, `23:59`.
+   - **Résultat attendu :** Aucune erreur de parsing ni inversion AM/PM, affichage cohérent avec les préférences utilisateur.
