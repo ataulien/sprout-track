@@ -1,40 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '../db';
 import { ApiResponse } from '../types';
-import { Settings } from '@prisma/client';
+import { Settings, Prisma } from '@prisma/client';
 import { withAuthContext, AuthResult } from '../utils/auth';
 import { checkWritePermission } from '../utils/writeProtection';
 
+async function resolveTargetFamilyId(req: NextRequest, authContext: AuthResult): Promise<string | null> {
+  const { familyId: userFamilyId, isSetupAuth, isSysAdmin, isAccountAuth } = authContext;
+
+  let targetFamilyId = userFamilyId;
+  if (!userFamilyId && (isSetupAuth || isSysAdmin || isAccountAuth)) {
+    const { searchParams } = new URL(req.url);
+    const queryFamilyId = searchParams.get('familyId');
+    if (queryFamilyId) {
+      targetFamilyId = queryFamilyId;
+    }
+  }
+
+  if (!targetFamilyId) return null;
+
+  const family = await prisma.family.findUnique({
+    where: { id: targetFamilyId },
+    select: { id: true },
+  });
+
+  return family?.id ?? null;
+}
+
+function getDefaultDateFormat(req: NextRequest): string {
+  const acceptLanguage = req.headers.get('accept-language') || '';
+  const isFrenchLocale = acceptLanguage.toLowerCase().startsWith('fr');
+  return isFrenchLocale ? 'DD/MM/YYYY' : 'MM/DD/YYYY';
+}
+
 async function handleGet(req: NextRequest, authContext: AuthResult) {
   try {
-    const { familyId: userFamilyId, isSetupAuth, isSysAdmin, isAccountAuth } = authContext;
-    
-    // Determine target family ID - prefer auth context, but allow query parameter for setup auth, account auth, and sysadmin
-    let targetFamilyId = userFamilyId;
-    if (!userFamilyId && (isSetupAuth || isSysAdmin || isAccountAuth)) {
-      const { searchParams } = new URL(req.url);
-      const queryFamilyId = searchParams.get('familyId');
-      if (queryFamilyId) {
-        targetFamilyId = queryFamilyId;
-      }
-    }
-    
+    const targetFamilyId = await resolveTargetFamilyId(req, authContext);
+
     if (!targetFamilyId) {
-      return NextResponse.json<ApiResponse<null>>({ success: false, error: 'User is not associated with a family.' }, { status: 403 });
+      return NextResponse.json<ApiResponse<null>>(
+        { success: false, error: 'Family not found or user is not associated with a valid family.' },
+        { status: 404 }
+      );
     }
 
     let settings = await prisma.settings.findFirst({
       where: { familyId: targetFamilyId },
     });
-    
+
     if (!settings) {
-      const acceptLanguage = req.headers.get('accept-language') || '';
-      const isFrenchLocale = acceptLanguage.toLowerCase().startsWith('fr');
-      const defaultDateFormat = isFrenchLocale ? 'DD/MM/YYYY' : 'MM/DD/YYYY';
+      const defaultDateFormat = getDefaultDateFormat(req);
 
       settings = await prisma.settings.create({
         data: {
-          familyName: 'My Family', // Default family name
+          familyName: 'My Family',
           defaultBottleUnit: 'OZ',
           defaultSolidsUnit: 'TBSP',
           defaultHeightUnit: 'IN',
@@ -46,9 +65,7 @@ async function handleGet(req: NextRequest, authContext: AuthResult) {
         },
       });
     } else if (!settings.timeFormat || !settings.dateFormat) {
-      const acceptLanguage = req.headers.get('accept-language') || '';
-      const isFrenchLocale = acceptLanguage.toLowerCase().startsWith('fr');
-      const defaultDateFormat = isFrenchLocale ? 'DD/MM/YYYY' : 'MM/DD/YYYY';
+      const defaultDateFormat = getDefaultDateFormat(req);
 
       settings = await prisma.settings.update({
         where: { id: settings.id },
@@ -64,6 +81,13 @@ async function handleGet(req: NextRequest, authContext: AuthResult) {
       data: settings,
     });
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+      return NextResponse.json<ApiResponse<Settings>>(
+        { success: false, error: 'Family not found or unavailable for settings creation.' },
+        { status: 404 }
+      );
+    }
+
     console.error('Error fetching settings:', error);
     return NextResponse.json<ApiResponse<Settings>>(
       {
@@ -76,35 +100,27 @@ async function handleGet(req: NextRequest, authContext: AuthResult) {
 }
 
 async function handlePut(req: NextRequest, authContext: AuthResult) {
-  // Check write permissions for expired accounts
   const writeCheck = checkWritePermission(authContext);
   if (!writeCheck.allowed) {
     return writeCheck.response!;
   }
 
   try {
-    const { familyId: userFamilyId, isSetupAuth, isSysAdmin, isAccountAuth } = authContext;
-    
-    // Determine target family ID - prefer auth context, but allow query parameter for setup auth, account auth, and sysadmin
-    let targetFamilyId = userFamilyId;
-    if (!userFamilyId && (isSetupAuth || isSysAdmin || isAccountAuth)) {
-      const { searchParams } = new URL(req.url);
-      const queryFamilyId = searchParams.get('familyId');
-      if (queryFamilyId) {
-        targetFamilyId = queryFamilyId;
-      }
-    }
-    
+    const targetFamilyId = await resolveTargetFamilyId(req, authContext);
+
     if (!targetFamilyId) {
-      return NextResponse.json<ApiResponse<null>>({ success: false, error: 'User is not associated with a family.' }, { status: 403 });
+      return NextResponse.json<ApiResponse<null>>(
+        { success: false, error: 'Family not found or user is not associated with a valid family.' },
+        { status: 404 }
+      );
     }
 
     const body = await req.json();
-    
-    let existingSettings = await prisma.settings.findFirst({
+
+    const existingSettings = await prisma.settings.findFirst({
       where: { familyId: targetFamilyId },
     });
-    
+
     if (!existingSettings) {
       return NextResponse.json<ApiResponse<Settings>>(
         {
@@ -139,19 +155,18 @@ async function handlePut(req: NextRequest, authContext: AuthResult) {
         (data as any)[field] = body[field];
       }
     }
-    
+
     const settings = await prisma.settings.update({
       where: { id: existingSettings.id },
       data,
     });
 
-    // If securityPin was updated, also update system caretaker's pin
     if (body.securityPin !== undefined) {
       try {
         const systemCaretaker = await prisma.caretaker.findFirst({
-          where: { 
+          where: {
             loginId: '00',
-            familyId: targetFamilyId 
+            familyId: targetFamilyId
           }
         });
 
@@ -166,7 +181,6 @@ async function handlePut(req: NextRequest, authContext: AuthResult) {
         }
       } catch (error) {
         console.error('Error updating system caretaker pin (non-fatal):', error);
-        // Don't fail the entire request if system caretaker update fails
       }
     }
 
