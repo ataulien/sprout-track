@@ -274,7 +274,7 @@ export default function BreastFeedForm({
   if (isEditing) {
     return (
       <div className="feed-form-container">
-                <Label className="form-label">{t('Duration -')} {side === 'LEFT' ? t('Left') : t('Right')} {t('Side')}</Label>
+        <Label className="form-label">{t('Duration -')} {side === 'LEFT' ? t('Left') : t('Right')} {t('Side')}</Label>
         <div className="flex flex-col items-center space-y-4 py-4">
           {side === 'LEFT' ? (
             <TimerInput
@@ -302,8 +302,8 @@ export default function BreastFeedForm({
             />
           )}
           <div className="flex justify-center">
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               variant={isTimerRunning && ((side === 'LEFT' && activeBreast === 'LEFT') || (side === 'RIGHT' && activeBreast === 'RIGHT')) ? 'default' : 'outline'}
               size="sm"
               onClick={(e: React.MouseEvent) => {
@@ -311,21 +311,35 @@ export default function BreastFeedForm({
                 if (isTimerRunning && ((side === 'LEFT' && activeBreast === 'LEFT') || (side === 'RIGHT' && activeBreast === 'RIGHT'))) {
                   handleTimerStop();
                 } else {
-                  handleTimerStop(); // Stop any existing timer
-                  setIsEditingLeft(false); // Exit edit mode if active
-                  setIsEditingRight(false); // Exit edit mode if active
+                  handleTimerStop();
+                  setIsEditingLeft(false);
+                  setIsEditingRight(false);
                   handleTimerStart(side as 'LEFT' | 'RIGHT');
                 }
               }}
               disabled={loading || isEditingLeft || isEditingRight}
             >
-              {isTimerRunning && ((side === 'LEFT' && activeBreast === 'LEFT') || (side === 'RIGHT' && activeBreast === 'RIGHT')) ? 
+              {isTimerRunning && ((side === 'LEFT' && activeBreast === 'LEFT') || (side === 'RIGHT' && activeBreast === 'RIGHT')) ?
                 <Pause className="h-4 w-4 mr-1" /> : <Play className="h-4 w-4 mr-1" />}
-              {isTimerRunning && ((side === 'LEFT' && activeBreast === 'LEFT') || (side === 'RIGHT' && activeBreast === 'RIGHT')) ? 
+              {isTimerRunning && ((side === 'LEFT' && activeBreast === 'LEFT') || (side === 'RIGHT' && activeBreast === 'RIGHT')) ?
                 t('Pause') : t('Start')}
             </Button>
           </div>
         </div>
+        {onNotesChange && (
+          <div className="mt-4">
+            <label className="form-label">{t('Notes')}</label>
+            <Textarea
+              id="notes"
+              name="notes"
+              placeholder={t("Enter any notes about the feeding")}
+              value={notes}
+              onChange={(e) => onNotesChange(e.target.value)}
+              rows={3}
+              disabled={loading}
+            />
+          </div>
+        )}
       </div>
     );
   }
