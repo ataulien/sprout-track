@@ -19,6 +19,7 @@ interface BreastFeedFormProps {
   onSideChange: (side: BreastSide | '') => void;
   onTimerStart: (breast: 'LEFT' | 'RIGHT') => void;
   onTimerStop: () => void;
+  onSwitchSide?: (side: 'LEFT' | 'RIGHT') => void;
   onDurationChange: (breast: 'LEFT' | 'RIGHT', seconds: number) => void;
   isEditing?: boolean; // New prop to indicate if we're editing an existing record
   validationError?: string; // Optional validation error message
@@ -58,6 +59,7 @@ export default function BreastFeedForm({
   onSideChange,
   onTimerStart,
   onTimerStop,
+  onSwitchSide,
   onDurationChange,
   isEditing = false, // Default to false
   notes = '',
@@ -360,9 +362,11 @@ export default function BreastFeedForm({
                 e.preventDefault();
                 if (isTimerRunning && activeBreast === 'LEFT') {
                   handleTimerStop();
+                } else if (isTimerRunning && activeBreast === 'RIGHT' && onSwitchSide) {
+                  onSwitchSide('LEFT');
                 } else {
-                  handleTimerStop(); // Stop any existing timer
-                  setIsEditingLeft(false); // Exit edit mode if active
+                  handleTimerStop();
+                  setIsEditingLeft(false);
                   handleTimerStart('LEFT');
                 }
               }}
@@ -407,9 +411,11 @@ export default function BreastFeedForm({
                 e.preventDefault();
                 if (isTimerRunning && activeBreast === 'RIGHT') {
                   handleTimerStop();
+                } else if (isTimerRunning && activeBreast === 'LEFT' && onSwitchSide) {
+                  onSwitchSide('RIGHT');
                 } else {
-                  handleTimerStop(); // Stop any existing timer
-                  setIsEditingRight(false); // Exit edit mode if active
+                  handleTimerStop();
+                  setIsEditingRight(false);
                   handleTimerStart('RIGHT');
                 }
               }}

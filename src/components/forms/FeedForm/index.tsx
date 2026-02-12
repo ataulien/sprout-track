@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FeedType, BreastSide } from '@prisma/client';
 import { FeedLogResponse } from '@/app/api/types';
 import { Button } from '@/src/components/ui/button';
@@ -23,6 +23,24 @@ import BreastFeedForm from './BreastFeedForm';
 import BottleFeedForm from './BottleFeedForm';
 import SolidsFeedForm from './SolidsFeedForm';
 import { useLocalization } from '@/src/context/localization';
+
+
+interface FeedingSegment {
+  side: 'LEFT' | 'RIGHT';
+  start: string;
+  end: string | null;
+}
+
+interface FeedingSessionResponse {
+  id: string;
+  status: 'ACTIVE' | 'PAUSED';
+  activeSide: 'LEFT' | 'RIGHT' | null;
+  note: string | null;
+  totalDuration: number;
+  leftDuration: number;
+  rightDuration: number;
+  segments: FeedingSegment[];
+}
 
 interface FeedFormProps {
   isOpen: boolean;
@@ -82,6 +100,10 @@ export default function FeedForm({
     defaultBottleUnit: 'OZ',
     defaultSolidsUnit: 'TBSP',
   });
+
+  const [activeSession, setActiveSession] = useState<FeedingSessionResponse | null>(null);
+  const noteSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSavedNoteRef = useRef<string>('');
 
   const fetchLastAmount = async (type: FeedType) => {
     if (!babyId) return;
@@ -299,6 +321,54 @@ export default function FeedForm({
     }
   }, [formData.type, babyId, defaultSettings.defaultBottleUnit, defaultSettings.defaultSolidsUnit]);
 
+
+  const fetchActiveSession = useCallback(async () => {
+    if (!babyId || formData.type !== 'BREAST' || activity) return;
+    try {
+      const authToken = localStorage.getItem('authToken');
+      const response = await fetch(`/api/feeding-session?babyId=${babyId}`, {
+        headers: { 'Authorization': authToken ? `Bearer ${authToken}` : '' },
+        cache: 'no-store',
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      if (data.success) {
+        setActiveSession(data.data);
+        if (data.data) {
+          setFormData(prev => ({
+            ...prev,
+            leftDuration: data.data.leftDuration,
+            rightDuration: data.data.rightDuration,
+            activeBreast: data.data.activeSide || '',
+            notes: data.data.note || prev.notes,
+          }));
+          lastSavedNoteRef.current = data.data.note || '';
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching active feeding session:', error);
+    }
+  }, [babyId, formData.type, activity]);
+
+  const mutateSession = useCallback(async (action: 'start'|'pause'|'resume'|'switch'|'stop'|'update-note', side?: 'LEFT'|'RIGHT', note?: string) => {
+    if (!babyId) return null;
+    const authToken = localStorage.getItem('authToken');
+    const response = await fetch('/api/feeding-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authToken ? `Bearer ${authToken}` : '',
+      },
+      body: JSON.stringify({ babyId, action, side, note }),
+    });
+
+    const data = await response.json();
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || t('Failed to save feed log'));
+    }
+    return data.data;
+  }, [babyId, t]);
+
   const handleAmountChange = (newAmount: string) => {
     // Allow any numeric values
     if (newAmount === '' || /^\d*\.?\d*$/.test(newAmount)) {
@@ -344,6 +414,53 @@ export default function FeedForm({
       }));
     }
   };
+
+
+  useEffect(() => {
+    if (!isOpen || activity || formData.type !== 'BREAST') return;
+
+    fetchActiveSession();
+    const interval = setInterval(fetchActiveSession, 3000);
+    return () => clearInterval(interval);
+  }, [isOpen, activity, formData.type, fetchActiveSession]);
+
+  const persistNote = useCallback(async () => {
+    if (!activeSession) return;
+    const trimmed = formData.notes?.trim() || '';
+    if (trimmed === (lastSavedNoteRef.current || '')) return;
+
+    try {
+      await mutateSession('update-note', undefined, trimmed);
+      lastSavedNoteRef.current = trimmed;
+    } catch (error) {
+      console.error('Error auto-saving feeding note:', error);
+      showToast({ variant: 'error', title: t('Error'), message: t('Failed to save note'), duration: 3000 });
+    }
+  }, [activeSession, formData.notes, mutateSession, showToast, t]);
+
+  useEffect(() => {
+    if (!activeSession) return;
+    if (noteSaveTimeoutRef.current) clearTimeout(noteSaveTimeoutRef.current);
+    noteSaveTimeoutRef.current = setTimeout(() => {
+      persistNote();
+    }, 600);
+    return () => {
+      if (noteSaveTimeoutRef.current) clearTimeout(noteSaveTimeoutRef.current);
+    };
+  }, [formData.notes, activeSession, persistNote]);
+
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        persistNote();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      persistNote();
+    };
+  }, [persistNote]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -400,26 +517,17 @@ export default function FeedForm({
       return;
     }
 
-    // Stop timer if it's running
-    if (isTimerRunning) {
-      stopTimer();
-    }
-
     setLoading(true);
 
     try {
       if (formData.type === 'BREAST' && !activity) {
-        // For new breast feeding entries, create entries for both sides if they have durations
-        // Use accurate durations captured above
-        if (accurateLeftDuration > 0 && accurateRightDuration > 0) {
-          // Create entries for both sides
-          await createBreastFeedingEntries(accurateLeftDuration, accurateRightDuration);
-        } else if (accurateLeftDuration > 0) {
-          // Create only left side entry
-          await createSingleFeedEntry('LEFT', accurateLeftDuration);
-        } else if (accurateRightDuration > 0) {
-          // Create only right side entry
-          await createSingleFeedEntry('RIGHT', accurateRightDuration);
+        if (activeSession) {
+          await persistNote();
+          await mutateSession('stop');
+        } else {
+          setValidationError(t('Start a feeding session before saving'));
+          setLoading(false);
+          return;
         }
       } else {
         // For editing or non-breast feeding entries, use the single entry method
@@ -454,22 +562,6 @@ export default function FeedForm({
       // Other errors are already handled with toast in createSingleFeedEntry
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Helper function to create entries for both breast sides
-  const createBreastFeedingEntries = async (leftDur?: number, rightDur?: number) => {
-    const leftDuration = leftDur ?? formData.leftDuration;
-    const rightDuration = rightDur ?? formData.rightDuration;
-
-    // Create left side entry
-    if (leftDuration > 0) {
-      await createSingleFeedEntry('LEFT', leftDuration);
-    }
-
-    // Create right side entry
-    if (rightDuration > 0) {
-      await createSingleFeedEntry('RIGHT', rightDuration);
     }
   };
 
@@ -573,81 +665,49 @@ export default function FeedForm({
 
   // This section is now handled in the createSingleFeedEntry and createBreastFeedingEntries functions
 
-  // Timer functionality
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const isTimerRunning = activeSession?.status === 'ACTIVE';
 
   // Ref to get current accurate durations from BreastFeedForm
   const getCurrentDurationsRef = useRef<(() => { left: number; right: number }) | null>(null);
-  
-  const startTimer = (breast: 'LEFT' | 'RIGHT') => {
-    if (!isTimerRunning) {
-      setIsTimerRunning(true);
-      
-      // Set the active breast if provided
-      if (breast) {
-        setFormData(prev => ({
-          ...prev,
-          activeBreast: breast
-        }));
+
+  const startTimer = async (breast: 'LEFT' | 'RIGHT') => {
+    try {
+      if (!activeSession) {
+        await mutateSession('start', breast, formData.notes);
+      } else if (activeSession.status === 'PAUSED') {
+        await mutateSession('resume', breast);
+      } else {
+        await mutateSession('switch', breast);
       }
-      
-      timerRef.current = setInterval(() => {
-        setFormData(prev => {
-          // Update the appropriate duration based on active breast
-          if (prev.activeBreast === 'LEFT') {
-            return {
-              ...prev,
-              leftDuration: prev.leftDuration + 1
-            };
-          } else if (prev.activeBreast === 'RIGHT') {
-            return {
-              ...prev,
-              rightDuration: prev.rightDuration + 1
-            };
-          } else {
-            // This case shouldn't happen with the simplified UI
-            return prev;
-          }
-        });
-      }, 1000);
+      await fetchActiveSession();
+    } catch (error) {
+      showToast({ variant: 'error', title: t('Error'), message: (error as Error).message, duration: 4000 });
     }
   };
-  
-  const stopTimer = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
+
+  const stopTimer = async () => {
+    if (!activeSession || activeSession.status !== 'ACTIVE') return;
+    try {
+      await mutateSession('pause');
+      await fetchActiveSession();
+    } catch (error) {
+      showToast({ variant: 'error', title: t('Error'), message: (error as Error).message, duration: 4000 });
     }
-    setIsTimerRunning(false);
-    
-    // Reset active breast when stopping timer
-    setFormData(prev => ({
-      ...prev,
-      activeBreast: ''
-    }));
   };
-  
-  // Format time as hh:mm:ss
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    
-    return [
-      hours.toString().padStart(2, '0'),
-      minutes.toString().padStart(2, '0'),
-      secs.toString().padStart(2, '0')
-    ].join(':');
+
+  const switchSide = async (breast: 'LEFT' | 'RIGHT') => {
+    if (!activeSession) return;
+    try {
+      await mutateSession('switch', breast);
+      await fetchActiveSession();
+    } catch (error) {
+      showToast({ variant: 'error', title: t('Error'), message: (error as Error).message, duration: 4000 });
+    }
   };
-  
+
   // Enhanced close handler that resets form state
   const handleClose = () => {
-    // Stop any running timer
-    if (isTimerRunning) {
-      stopTimer();
-    }
-    
+    persistNote();
     // Clear validation errors
     setValidationError('');
     
@@ -676,15 +736,6 @@ export default function FeedForm({
     onClose();
   };
 
-  // Clean up timer on unmount
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, []);
-  
   return (
     <FormPage
       isOpen={isOpen}
@@ -796,6 +847,7 @@ export default function FeedForm({
                 onSideChange={(side) => setFormData({ ...formData, side })}
                 onTimerStart={startTimer}
                 onTimerStop={stopTimer}
+                onSwitchSide={switchSide}
                 onDurationChange={(breast, seconds) => {
                   if (breast === 'LEFT') {
                     setFormData(prev => ({ ...prev, leftDuration: seconds }));
@@ -855,7 +907,7 @@ export default function FeedForm({
               {t('Cancel')}
             </Button>
             <Button onClick={handleSubmit} disabled={loading}>
-              {activity ? t('Update') : t('Save')}
+              {formData.type === 'BREAST' && !activity ? t('Stop') : (activity ? t('Update') : t('Save'))}
             </Button>
           </div>
         </FormPageFooter>

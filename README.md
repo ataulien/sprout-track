@@ -540,3 +540,33 @@ The `./scripts/env-update.sh` script automatically manages environment variables
 7. **Tester cas limites horaires**
    - **Étapes :** Valider `00:00`, `12:00 AM`, `12:00 PM`, `23:59`.
    - **Résultat attendu :** Aucune erreur de parsing ni inversion AM/PM, affichage cohérent avec les préférences utilisateur.
+
+## Testing – Advanced Feeding Session
+
+1. **Démarrage**
+   - Ouvrir l'onglet alimentation et démarrer une tétée sur le sein gauche ou droit.
+   - Vérifier via `GET /api/feeding-session?babyId=<id>` qu'un segment ouvert est présent (`end = null`).
+
+2. **Pause / reprise**
+   - Mettre en pause la session active.
+   - Reprendre la session.
+   - Vérifier qu'un nouveau segment est créé et que l'ancien segment est fermé.
+
+3. **Changement de sein**
+   - Basculer de gauche vers droite (ou inversement).
+   - Vérifier qu'un segment est clôturé puis qu'un nouveau segment démarre avec `side` mis à jour.
+
+4. **Multi-utilisateur**
+   - Ouvrir deux navigateurs sur le même profil enfant.
+   - Démarrer/pause/changer de sein dans le navigateur A.
+   - Vérifier dans le navigateur B (polling) la synchronisation de l'état, du sein actif et des durées.
+
+5. **Auto-save note**
+   - Modifier la note pendant une session d'alimentation.
+   - Changer d'onglet ou fermer le panneau alimentation.
+   - Vérifier que la note est persistée côté session active, puis reprise après rechargement.
+
+6. **Arrêt**
+   - Arrêter la session via le bouton Stop.
+   - Vérifier la création des entrées `FeedLog` (gauche/droite selon durées) avec durées cumulées.
+   - Vérifier la disparition de la session active (`GET /api/feeding-session` retourne `null`).
