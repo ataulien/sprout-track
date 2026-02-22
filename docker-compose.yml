@@ -6,8 +6,8 @@ services:
       args:
         ENABLE_NOTIFICATIONS: ${ENABLE_NOTIFICATIONS:-false}
         BUILD_NOTIFICATIONS: ${ENABLE_NOTIFICATIONS:-false}
-    image: sprout-track
-    container_name: sprout-track
+    image: ataulien/sprout-track-ger:latest
+    container_name: sprout-track-ger
     restart: unless-stopped
     ports:
       - "${PORT:-3000}:3000"

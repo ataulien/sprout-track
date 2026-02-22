@@ -55,7 +55,8 @@ RUN mkdir -p /app/env && \
     echo "APP_VERSION=0.97.2" >> /app/env/.env && \
     echo "COOKIE_SECURE=false" >> /app/env/.env && \
     echo "Base .env file created (ENC_HASH will be generated at startup)" && \
-    # Create symlink so Next.js can find the env file at build time and runtime
+    # Remove any existing file and create symlink so Next.js can find the env file at build time and runtime
+    rm -f /app/.env || true && \
     ln -s /app/env/.env /app/.env
 
 # Build the application
