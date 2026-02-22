@@ -5,7 +5,7 @@ import { Family } from '@prisma/client';
 
 const getDefaultDateFormat = (acceptLanguage?: string | null) => {
   if (!acceptLanguage) return 'MM/DD/YYYY';
-  return acceptLanguage.toLowerCase().startsWith('fr') ? 'DD/MM/YYYY' : 'MM/DD/YYYY';
+  return acceptLanguage.toLowerCase().startsWith('fr') ? 'DD.MM.YYYY' : 'MM/DD/YYYY';
 };
 
 interface SetupStartRequest {

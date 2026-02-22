@@ -34,7 +34,7 @@ export interface FamilyUpdate extends Partial<FamilyCreate> {
 // Settings types
 export type Settings = PrismaSettings & {
   timeFormat: '24h' | '12h';
-  dateFormat: 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
+  dateFormat: 'DD.MM.YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
 };
 
 // Activity settings types

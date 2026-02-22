@@ -26,7 +26,7 @@ const TimelineV2ActivityList = ({
     () =>
       getDateTimePreferences({
         timeFormat: settings?.timeFormat as '24h' | '12h' | undefined,
-        dateFormat: settings?.dateFormat as 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD' | undefined,
+        dateFormat: settings?.dateFormat as 'DD.MM.YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD' | undefined,
       }),
     [settings]
   );
@@ -289,7 +289,7 @@ const TimelineV2ActivityList = ({
                                     
                                     if ('amount' in activity) {
                                       if (activity.type === 'BREAST') {
-                                        const side = t(activity.side) ? t(activity.side.charAt(0) + activity.side.slice(1).toLowerCase()) : '';
+                                        const side = activity.side;  // t(activity.side) ? t(activity.side.charAt(0) + activity.side.slice(1).toLowerCase()) : '';
                                         let duration = '';
                                         if (activity.feedDuration) {
                                           const minutes = Math.floor(activity.feedDuration / 60);

@@ -64,7 +64,7 @@ export default function SettingsModal({
     { value: '12h', label: t('12-hour (AM/PM)') },
   ];
   const dateFormatOptions = [
-    { value: 'DD/MM/YYYY', label: t('DD/MM/YYYY') },
+    { value: 'DD.MM.YYYY', label: t('DD.MM.YYYY') },
     { value: 'MM/DD/YYYY', label: t('MM/DD/YYYY') },
     { value: 'YYYY-MM-DD', label: t('YYYY-MM-DD') },
   ];

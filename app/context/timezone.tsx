@@ -126,6 +126,7 @@ export function TimezoneProvider({ children }: { children: ReactNode }) {
     if (!language) return 'en-US';
     if (language.toLowerCase().startsWith('fr')) return 'fr-FR';
     if (language.toLowerCase().startsWith('es')) return 'es-ES';
+    if (language.toLowerCase().startsWith('de')) return 'de-DE';
     return 'en-US';
   }, [language]);
 
