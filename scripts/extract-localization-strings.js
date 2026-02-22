@@ -88,12 +88,12 @@ function shouldSkipString(str) {
   }
 
   // Skip URLs and file paths
-  if (str.startsWith('http://') || str.startsWith('https://') || 
-      str.startsWith('/') || str.includes('\\') || str.includes('./') ||
-      // module-ish paths like "@/foo/bar" or "../foo"
-      str.startsWith('@/') || str.startsWith('./') || str.startsWith('../') ||
-      // any slash-delimited token with no spaces is almost always a path
-      (str.includes('/') && !str.includes(' '))) {
+  if (str.startsWith('http://') || str.startsWith('https://') ||
+    str.startsWith('/') || str.includes('\\') || str.includes('./') ||
+    // module-ish paths like "@/foo/bar" or "../foo"
+    str.startsWith('@/') || str.startsWith('./') || str.startsWith('../') ||
+    // any slash-delimited token with no spaces is almost always a path
+    (str.includes('/') && !str.includes(' '))) {
     return true;
   }
 
@@ -173,11 +173,11 @@ function isAlreadyLocalized(content, text, startPos, endPos) {
   // Get surrounding context to check if already in t() call
   const beforeContext = content.substring(Math.max(0, startPos - 50), startPos);
   const afterContext = content.substring(endPos, Math.min(content.length, endPos + 50));
-  
+
   // Check if the text is already inside {t('...')} or {t("...")}
   // Look for patterns like {t('Text')} or {t("Text")} around this position
   const fullContext = beforeContext + text + afterContext;
-  
+
   // Check if we're inside a t() call
   // Pattern: {t('text')} or {t("text")}
   const tCallPattern = /\{t\(['"]([^'"]*)['"]\)\}/g;
@@ -194,7 +194,7 @@ function isAlreadyLocalized(content, text, startPos, endPos) {
       }
     }
   }
-  
+
   return false;
 }
 
@@ -205,7 +205,7 @@ function isAlreadyLocalized(content, text, startPos, endPos) {
 function extractStrings(filePath, content) {
   const strings = new Set();
   const stringDetails = []; // Store details for logging
-  
+
   // Extract JSX rendered text only:
   // We walk the TSX AST and collect JsxText nodes (what appears between tags),
   // instead of regexing string literals (which pulls in import paths, classnames, etc).
@@ -224,12 +224,12 @@ function extractStrings(filePath, content) {
       ) {
         const startPos = node.getStart(sourceFile);
         const endPos = node.getEnd();
-        
+
         // Check if this string is already wrapped in t() call
         if (isAlreadyLocalized(content, text, startPos, endPos)) {
           return; // Skip already localized strings
         }
-        
+
         const lcStart = sourceFile.getLineAndCharacterOfPosition(startPos);
         const lcEnd = sourceFile.getLineAndCharacterOfPosition(endPos);
         const context = getContextSnippet(lines, lcStart.line, lcEnd.line, 1);
@@ -300,7 +300,7 @@ function loadSupportedLanguages() {
     return unique.includes('en') ? unique : ['en', ...unique];
   } catch {
     // Fallback to current app default if config file is missing/invalid
-    return ['en', 'es', 'fr'];
+    return ['en', 'es', 'fr', 'de'];
   }
 }
 
@@ -322,12 +322,12 @@ function addLocalizationImport(content) {
   // Find the last import statement
   const importRegex = /^import\s+.*from\s+['"].*['"];?\s*$/gm;
   const imports = content.match(importRegex);
-  
+
   if (imports && imports.length > 0) {
     const lastImport = imports[imports.length - 1];
     const lastImportIndex = content.lastIndexOf(lastImport);
     const afterLastImport = content.substring(lastImportIndex + lastImport.length);
-    
+
     // Add the import after the last import
     const newImport = "import { useLocalization } from '@/src/context/localization';\n";
     return content.substring(0, lastImportIndex + lastImport.length) + newImport + afterLastImport;
@@ -341,18 +341,18 @@ function addLocalizationImport(content) {
  * Add useLocalization hook call if needed
  */
 function addLocalizationHook(content) {
-  if (content.includes('const { t } = useLocalization()') || 
-      content.includes('const { t } = useLocalization();')) {
+  if (content.includes('const { t } = useLocalization()') ||
+    content.includes('const { t } = useLocalization();')) {
     return content;
   }
 
   // Find the first function component or hook
   const functionMatch = content.match(/(export\s+)?(default\s+)?function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*=>|const\s+\w+\s*=\s*\([^)]*\)\s*:\s*\w+\s*=>/);
-  
+
   if (functionMatch) {
     const matchIndex = functionMatch.index + functionMatch[0].length;
     const afterMatch = content.substring(matchIndex);
-    
+
     // Find the opening brace
     const braceIndex = afterMatch.indexOf('{');
     if (braceIndex !== -1) {
@@ -446,10 +446,10 @@ function findFiles(dir, fileList = []) {
       }
     } else if (stat.isFile()) {
       // Only include .ts and .tsx files
-      if ((file.endsWith('.ts') || file.endsWith('.tsx')) && 
-          !EXCLUDE_FILES.includes(file) &&
-          !file.includes('.test.') &&
-          !file.includes('.spec.')) {
+      if ((file.endsWith('.ts') || file.endsWith('.tsx')) &&
+        !EXCLUDE_FILES.includes(file) &&
+        !file.includes('.test.') &&
+        !file.includes('.spec.')) {
         fileList.push(filePath);
       }
     }
@@ -500,7 +500,7 @@ async function main() {
     try {
       const content = fs.readFileSync(filePath, 'utf8');
       const { strings, details } = extractStrings(filePath, content);
-      
+
       if (strings.length > 0) {
         fileStrings.set(filePath, strings);
         fileDetails.set(filePath, details);
@@ -538,7 +538,7 @@ async function main() {
     console.log(`   Total translation keys: ${Object.keys(translationsByLang.en).length}\n`);
   } else if (dryRun) {
     console.log(`[DRY RUN] Would add ${addedCount} new strings to language files\n`);
-    
+
     // Create detailed log file
     const logFile = path.join(__dirname, '../localization-extraction-log.txt');
     const logLines = [];
@@ -580,7 +580,7 @@ async function main() {
       const relativePath = path.relative(process.cwd(), filePath);
       logLines.push(`File: ${relativePath}`);
       logLines.push('-'.repeat(80));
-      
+
       // Group by line number
       const byLine = {};
       details.forEach(detail => {
@@ -589,10 +589,10 @@ async function main() {
         }
         byLine[detail.line].push(detail);
       });
-      
+
       // Sort by line number
       const sortedLines = Object.keys(byLine).sort((a, b) => parseInt(a) - parseInt(b));
-      
+
       sortedLines.forEach(lineNum => {
         byLine[lineNum].forEach(detail => {
           logLines.push(`  Line ${lineNum} (${detail.type}):`);
@@ -612,7 +612,7 @@ async function main() {
           logLines.push('');
         });
       });
-      
+
       logLines.push('');
     }
 
@@ -626,11 +626,11 @@ async function main() {
       logLines.push(`  "${str}"`);
       logLines.push('');
     });
-    
+
     logLines.push('='.repeat(80));
     logLines.push('END OF LOG');
     logLines.push('='.repeat(80));
-    
+
     fs.writeFileSync(logFile, logLines.join('\n'), 'utf8');
     console.log(`[LOG] Detailed log written to: ${path.relative(process.cwd(), logFile)}`);
     console.log('');
@@ -688,7 +688,7 @@ async function main() {
       console.log(`  - ${filePath} (${count} string${count !== 1 ? 's' : ''})`);
     });
     console.log('\n' + '='.repeat(80));
-    
+
     // Write to a file for easy reference
     const remainingFilesPath = path.join(__dirname, '../localization-remaining-files.txt');
     const fileListContent = [

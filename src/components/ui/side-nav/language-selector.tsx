@@ -15,7 +15,7 @@ import supportedLanguagesJson from '@/src/localization/supported-languages.json'
 
 const SUPPORTED_LANGUAGES = Array.isArray(supportedLanguagesJson)
   ? supportedLanguagesJson
-  : ['en', 'es', 'fr'];
+  : ['en', 'es', 'de', 'fr'];
 
 /**
  * Language code to display name mapping
@@ -23,6 +23,7 @@ const SUPPORTED_LANGUAGES = Array.isArray(supportedLanguagesJson)
 const LANGUAGE_NAMES: Record<string, { code: string; name: string }> = {
   en: { code: 'EN', name: 'English' },
   es: { code: 'ES', name: 'Español' },
+  de: { code: 'DE', name: 'Deutsch' },
   fr: { code: 'FR', name: 'Français' },
 };
 
