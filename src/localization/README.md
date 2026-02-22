@@ -26,6 +26,7 @@ The localization system consists of several components:
 Translations are stored in **per-language JSON files** under `src/localization/translations/`.
 
 - `en.json`: English (also acts as the fallback)
+- `de.json`: German
 - `es.json`: Spanish
 - `fr.json`: French
 - Supported languages are configured in `src/localization/supported-languages.json`.

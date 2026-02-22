@@ -45,7 +45,7 @@ export function DateTimePicker({
   onChange,
   className,
   disabled = false,
-  placeholder = "Select date and time...",
+  placeholder = "Datum und Zeit wählen...",
 }: DateTimePickerProps) {
   const { formatDateOnly, formatTime } = useTimezone();
   const { t } = useLocalization();
