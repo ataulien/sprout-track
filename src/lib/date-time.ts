@@ -1,5 +1,5 @@
 export type TimeFormat = '24h' | '12h';
-export type DateFormat = 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
+export type DateFormat = 'DD.MM.YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
 
 export interface DateTimePreferences {
   timeFormat?: TimeFormat;
@@ -17,7 +17,7 @@ export const DEFAULT_DATE_FORMAT: DateFormat = 'MM/DD/YYYY';
 
 export const getDefaultDateFormat = (language?: string): DateFormat => {
   if (!language) return DEFAULT_DATE_FORMAT;
-  return language.toLowerCase().startsWith('fr') ? 'DD/MM/YYYY' : DEFAULT_DATE_FORMAT;
+  return language.toLowerCase().startsWith('fr') ? 'DD.MM.YYYY' : DEFAULT_DATE_FORMAT;
 };
 
 export const getDateTimePreferences = (
@@ -86,7 +86,7 @@ export const formatDate = (
     return [year, month, day].join('-');
   }
 
-  const ordered = dateFormat === 'DD/MM/YYYY' ? [day, month, year] : [month, day, year];
+  const ordered = dateFormat === 'DD.MM.YYYY' ? [day, month, year] : [month, day, year];
   return ordered.join('/');
 };
 
@@ -155,6 +155,7 @@ const resolveLocale = (options?: DateTimeFormatOptions): string => {
   if (options?.language) {
     if (options.language.toLowerCase().startsWith('fr')) return 'fr-FR';
     if (options.language.toLowerCase().startsWith('es')) return 'es-ES';
+    if (options.language.toLowerCase().startsWith('de')) return 'de-DE';
     return 'en-US';
   }
   if (typeof navigator !== 'undefined' && navigator.language) {
@@ -205,7 +206,7 @@ export const parseDateInput = (
 
   if (dateFormat === 'YYYY-MM-DD') {
     [year, month, day] = parts.map(Number);
-  } else if (dateFormat === 'DD/MM/YYYY') {
+  } else if (dateFormat === 'DD.MM.YYYY') {
     [day, month, year] = parts.map(Number);
   } else {
     [month, day, year] = parts.map(Number);

@@ -188,7 +188,7 @@ async function main() {
     console.log(`Using existing family: ${firstFamily!.name} for settings`);
   }
 
-  const defaultDateFormat = seedLocale?.startsWith('fr') ? 'DD/MM/YYYY' : 'MM/DD/YYYY';
+  const defaultDateFormat = seedLocale?.startsWith('fr') ? 'DD.MM.YYYY' : 'MM/DD/YYYY';
 
   // Ensure default settings exist with PIN 111222
   const settingsCount = await prisma.settings.count();

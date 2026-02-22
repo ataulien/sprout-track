@@ -32,7 +32,7 @@ export default function FeedbackPage({
   const formatDateTime = useCallback((dateString: string | null): string => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
+    return date.toLocaleString('de-DE', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',

@@ -107,7 +107,7 @@ export function TimezoneDebug() {
     
     // Get timezone name with abbreviation
     const formattedTime = formatDateTime(nowIso) + ' ' + 
-      new Intl.DateTimeFormat('en-US', {
+      new Intl.DateTimeFormat('de-DE', {
         timeZone: userTimezone,
         timeZoneName: 'short'
       }).format(now).split(', ')[1];
@@ -134,7 +134,7 @@ export function TimezoneDebug() {
       userTimezone,
       isDST,
       offset: now.getTimezoneOffset(),
-      formattedWithTimezoneName: new Intl.DateTimeFormat('en-US', {
+      formattedWithTimezoneName: new Intl.DateTimeFormat('de-DE', {
         timeZone: userTimezone,
         timeZoneName: 'long',
         year: 'numeric',

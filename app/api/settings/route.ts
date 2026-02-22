@@ -146,7 +146,7 @@ async function handlePut(req: NextRequest, authContext: AuthResult) {
             { status: 400 }
           );
         }
-        if (field === 'dateFormat' && !['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY-MM-DD'].includes(body[field])) {
+        if (field === 'dateFormat' && !['DD.MM.YYYY', 'MM/DD/YYYY', 'YYYY-MM-DD'].includes(body[field])) {
           return NextResponse.json<ApiResponse<Settings>>(
             { success: false, error: 'Invalid date format' },
             { status: 400 }

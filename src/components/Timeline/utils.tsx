@@ -96,7 +96,7 @@ export const formatTime = (date: string, settings: Settings | null, includeDate:
 
     const preferences = getDateTimePreferences({
       timeFormat: settings?.timeFormat as '24h' | '12h' | undefined,
-      dateFormat: settings?.dateFormat as 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD' | undefined,
+      dateFormat: settings?.dateFormat as 'DD.MM.YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD' | undefined,
     });
     const timeStr = formatTimeDisplay(dateObj, preferences);
 
