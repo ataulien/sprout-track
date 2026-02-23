@@ -544,9 +544,8 @@ export default function FeedForm({
           await persistNote();
           await mutateSession('stop');
         } else {
-          setValidationError(t('Start a feeding session before saving'));
-          setLoading(false);
-          return;
+          // For editing or non-breast feeding entries, use the single entry method
+          await createSingleFeedEntry(formData.side as BreastSide);
         }
       } else {
         // For editing or non-breast feeding entries, use the single entry method
@@ -981,7 +980,7 @@ export default function FeedForm({
               </Button>
             )}
             <Button onClick={handleSubmit} disabled={loading}>
-              {formData.type === 'BREAST' && !activity ? t('Stop') : (activity ? t('Update') : t('Save'))}
+              {formData.type === 'BREAST' && !activity && activeSession ? t('Stop') : (activity ? t('Update') : t('Save'))}
             </Button>
           </div>
         </FormPageFooter>
