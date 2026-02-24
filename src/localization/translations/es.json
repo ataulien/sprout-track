@@ -1386,8 +1386,5 @@
   "Period": "Período",
   "Select hour": "Seleccionar hora",
   "Select minute": "Seleccionar minutos",
-  "Select period": "Seleccionar AM/PM",
-  "Failed to save note": "No se pudo guardar la nota",
-  "Start a feeding session before saving": "Inicia una sesión de alimentación antes de guardar",
-  "An active feeding session already exists": "Ya existe una sesión de alimentación activa"
+  "Select period": "Seleccionar AM/PM"
 }
