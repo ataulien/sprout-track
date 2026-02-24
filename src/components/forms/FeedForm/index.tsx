@@ -104,8 +104,6 @@ export default function FeedForm({
   const [activeSession, setActiveSession] = useState<FeedingSessionResponse | null>(null);
   const noteSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedNoteRef = useRef<string>('');
-  const isNoteDirtyRef = useRef(false);
-  const hasHydratedSessionNoteRef = useRef(false);
 
   const fetchLastAmount = async (type: FeedType) => {
     if (!babyId) return;
@@ -337,23 +335,14 @@ export default function FeedForm({
       if (data.success) {
         setActiveSession(data.data);
         if (data.data) {
-          const serverNote = data.data.note || '';
           setFormData(prev => ({
             ...prev,
             leftDuration: data.data.leftDuration,
             rightDuration: data.data.rightDuration,
             activeBreast: data.data.activeSide || '',
-            ...( !isNoteDirtyRef.current || !hasHydratedSessionNoteRef.current
-              ? { notes: serverNote }
-              : {}),
+            notes: data.data.note || prev.notes,
           }));
-          lastSavedNoteRef.current = serverNote;
-          if (!hasHydratedSessionNoteRef.current) {
-            hasHydratedSessionNoteRef.current = true;
-          }
-        } else {
-          hasHydratedSessionNoteRef.current = false;
-          isNoteDirtyRef.current = false;
+          lastSavedNoteRef.current = data.data.note || '';
         }
       }
     } catch (error) {
@@ -443,7 +432,6 @@ export default function FeedForm({
     try {
       await mutateSession('update-note', undefined, trimmed);
       lastSavedNoteRef.current = trimmed;
-      isNoteDirtyRef.current = false;
     } catch (error) {
       console.error('Error auto-saving feeding note:', error);
       showToast({ variant: 'error', title: t('Error'), message: t('Failed to save note'), duration: 3000 });
@@ -473,12 +461,6 @@ export default function FeedForm({
       persistNote();
     };
   }, [persistNote]);
-
-
-  const handleNotesChange = useCallback((notes: string) => {
-    isNoteDirtyRef.current = true;
-    setFormData(prev => ({ ...prev, notes }));
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -723,8 +705,8 @@ export default function FeedForm({
   };
 
   // Enhanced close handler that resets form state
-  const handleClose = async () => {
-    await persistNote();
+  const handleClose = () => {
+    persistNote();
     // Clear validation errors
     setValidationError('');
     
@@ -745,8 +727,6 @@ export default function FeedForm({
       rightDuration: 0,
       activeBreast: ''
     });
-    isNoteDirtyRef.current = false;
-    hasHydratedSessionNoteRef.current = false;
     
     // Reset initialization flag
     setIsInitialized(false);
@@ -876,7 +856,7 @@ export default function FeedForm({
                 }}
                 isEditing={!!activity} // Pass true if editing an existing record
                 notes={formData.notes}
-                onNotesChange={handleNotesChange}
+                onNotesChange={(notes) => setFormData(prev => ({ ...prev, notes }))}
                 getCurrentDurations={getCurrentDurationsRef}
               />
             )}
@@ -891,7 +871,7 @@ export default function FeedForm({
                 onAmountChange={handleAmountChange}
                 onUnitChange={(unit) => setFormData(prev => ({ ...prev, unit }))}
                 onBottleTypeChange={(bottleType) => setFormData(prev => ({ ...prev, bottleType }))}
-                onNotesChange={handleNotesChange}
+                onNotesChange={(notes) => setFormData(prev => ({ ...prev, notes }))}
                 onIncrement={incrementAmount}
                 onDecrement={decrementAmount}
               />
@@ -907,7 +887,7 @@ export default function FeedForm({
                 onAmountChange={handleAmountChange}
                 onUnitChange={(unit) => setFormData(prev => ({ ...prev, unit }))}
                 onFoodChange={(food) => setFormData({ ...formData, food })}
-                onNotesChange={handleNotesChange}
+                onNotesChange={(notes) => setFormData(prev => ({ ...prev, notes }))}
                 onIncrement={incrementAmount}
                 onDecrement={decrementAmount}
               />
