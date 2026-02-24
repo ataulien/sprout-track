@@ -362,7 +362,7 @@ export default function FeedForm({
     }
   }, [babyId, activity]);
 
-  const mutateSession = useCallback(async (action: 'start'|'pause'|'resume'|'switch'|'stop'|'reset'|'update-note', side?: 'LEFT'|'RIGHT', note?: string) => {
+  const mutateSession = useCallback(async (action: 'start'|'pause'|'resume'|'switch'|'stop'|'update-note', side?: 'LEFT'|'RIGHT', note?: string) => {
     if (!babyId) return null;
     const authToken = localStorage.getItem('authToken');
     const response = await fetch('/api/feeding-session', {
@@ -723,28 +723,6 @@ export default function FeedForm({
     }
   };
 
-
-  const resetFeedingStatus = async () => {
-    if (!babyId || activity) return;
-    try {
-      await mutateSession('reset');
-      setActiveSession(null);
-      isNoteDirtyRef.current = false;
-      hasHydratedSessionNoteRef.current = false;
-      setFormData(prev => ({
-        ...prev,
-        type: 'BREAST',
-        leftDuration: 0,
-        rightDuration: 0,
-        activeBreast: '',
-        notes: '',
-      }));
-      showToast({ variant: 'success', title: t('Success'), message: t('Breastfeeding status reset'), duration: 3000 });
-    } catch (error) {
-      showToast({ variant: 'error', title: t('Error'), message: (error as Error).message || t('Failed to reset breastfeeding status'), duration: 4000 });
-    }
-  };
-
   // Enhanced close handler that resets form state
   const handleClose = async () => {
     if (!activity && babyId) {
@@ -969,16 +947,6 @@ export default function FeedForm({
             >
               {t('Cancel')}
             </Button>
-            {formData.type === 'BREAST' && !activity && activeSession && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={resetFeedingStatus}
-                disabled={loading}
-              >
-                {t('Reset Breastfeeding Status')}
-              </Button>
-            )}
             <Button onClick={handleSubmit} disabled={loading}>
               {formData.type === 'BREAST' && !activity && activeSession ? t('Stop') : (activity ? t('Update') : t('Save'))}
             </Button>
