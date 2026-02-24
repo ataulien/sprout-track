@@ -1389,8 +1389,5 @@
   "Select period": "Seleccionar AM/PM",
   "Failed to save note": "No se pudo guardar la nota",
   "Start a feeding session before saving": "Inicia una sesión de alimentación antes de guardar",
-  "An active feeding session already exists": "Ya existe una sesión de alimentación activa",
-  "Breastfeeding status reset": "Estado de lactancia restablecido",
-  "Failed to reset breastfeeding status": "No se pudo restablecer el estado de lactancia",
-  "Reset Breastfeeding Status": "Restablecer estado de lactancia"
+  "An active feeding session already exists": "Ya existe una sesión de alimentación activa"
 }

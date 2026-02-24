@@ -70,7 +70,7 @@ async function handlePost(req: NextRequest, authContext: AuthResult) {
 
   try {
     const body = await req.json();
-    const { babyId, action, side, note } = body as { babyId: string; action: 'start'|'pause'|'resume'|'switch'|'stop'|'reset'|'update-note'; side?: 'LEFT'|'RIGHT'; note?: string; };
+    const { babyId, action, side, note } = body as { babyId: string; action: 'start'|'pause'|'resume'|'switch'|'stop'|'update-note'; side?: 'LEFT'|'RIGHT'; note?: string; };
     if (!babyId || !action) return NextResponse.json<ApiResponse<null>>({ success: false, error: 'babyId and action are required' }, { status: 400 });
 
     const existing = await prisma.feedingSession.findFirst({
@@ -118,12 +118,6 @@ async function handlePost(req: NextRequest, authContext: AuthResult) {
       const updated = await prisma.feedingSession.update({ where: { id: existing.id }, data: { status: 'ACTIVE', activeSide: side as BreastSide, segments: [...closeOpenSegment(segments), { side, start: nowISO, end: null }] } });
       return NextResponse.json<ApiResponse<FeedingSessionResponse>>({ success: true, data: mapSession(updated) });
     }
-
-    if (action === 'reset') {
-      await prisma.feedingSession.delete({ where: { id: existing.id } });
-      return NextResponse.json<ApiResponse<{ reset: true }>>({ success: true, data: { reset: true } });
-    }
-
     if (action === 'stop') {
       const closedSegments = closeOpenSegment(segments);
       const { leftDuration, rightDuration } = computeDurations(closedSegments);

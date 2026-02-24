@@ -1389,8 +1389,5 @@
   "Select period": "Sélectionner AM/PM",
   "Failed to save note": "Échec de l'enregistrement de la note",
   "Start a feeding session before saving": "Démarrez une session d'allaitement avant d'enregistrer",
-  "An active feeding session already exists": "Une session d'alimentation active existe déjà",
-  "Breastfeeding status reset": "Statut de tétée réinitialisé",
-  "Failed to reset breastfeeding status": "Échec de la réinitialisation du statut de tétée",
-  "Reset Breastfeeding Status": "Réinitialiser le statut de tétée"
+  "An active feeding session already exists": "Une session d'alimentation active existe déjà"
 }

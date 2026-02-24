@@ -1389,8 +1389,5 @@
   "Select period": "Select period",
   "Failed to save note": "Failed to save note",
   "Start a feeding session before saving": "Start a feeding session before saving",
-  "An active feeding session already exists": "An active feeding session already exists",
-  "Breastfeeding status reset": "Breastfeeding status reset",
-  "Failed to reset breastfeeding status": "Failed to reset breastfeeding status",
-  "Reset Breastfeeding Status": "Reset Breastfeeding Status"
+  "An active feeding session already exists": "An active feeding session already exists"
 }
