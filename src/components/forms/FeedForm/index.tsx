@@ -325,7 +325,7 @@ export default function FeedForm({
 
 
   const fetchActiveSession = useCallback(async () => {
-    if (!babyId || activity) return;
+    if (!babyId || formData.type !== 'BREAST' || activity) return;
     try {
       const authToken = localStorage.getItem('authToken');
       const response = await fetch(`/api/feeding-session?babyId=${babyId}`, {
@@ -340,7 +340,6 @@ export default function FeedForm({
           const serverNote = data.data.note || '';
           setFormData(prev => ({
             ...prev,
-            type: 'BREAST',
             leftDuration: data.data.leftDuration,
             rightDuration: data.data.rightDuration,
             activeBreast: data.data.activeSide || '',
@@ -360,7 +359,7 @@ export default function FeedForm({
     } catch (error) {
       console.error('Error fetching active feeding session:', error);
     }
-  }, [babyId, activity]);
+  }, [babyId, formData.type, activity]);
 
   const mutateSession = useCallback(async (action: 'start'|'pause'|'resume'|'switch'|'stop'|'update-note', side?: 'LEFT'|'RIGHT', note?: string) => {
     if (!babyId) return null;
@@ -429,12 +428,12 @@ export default function FeedForm({
 
 
   useEffect(() => {
-    if (!isOpen || activity) return;
+    if (!isOpen || activity || formData.type !== 'BREAST') return;
 
     fetchActiveSession();
     const interval = setInterval(fetchActiveSession, 3000);
     return () => clearInterval(interval);
-  }, [isOpen, activity, fetchActiveSession]);
+  }, [isOpen, activity, formData.type, fetchActiveSession]);
 
   const persistNote = useCallback(async () => {
     if (!activeSession) return;
@@ -725,28 +724,7 @@ export default function FeedForm({
 
   // Enhanced close handler that resets form state
   const handleClose = async () => {
-    if (!activity && babyId) {
-      if (activeSession) {
-        await persistNote();
-      } else {
-        try {
-          const authToken = localStorage.getItem('authToken');
-          const response = await fetch(`/api/feeding-session?babyId=${babyId}`, {
-            headers: { 'Authorization': authToken ? `Bearer ${authToken}` : '' },
-            cache: 'no-store',
-          });
-          const data = response.ok ? await response.json() : null;
-          if (data?.success && data?.data) {
-            const trimmed = formData.notes?.trim() || '';
-            await mutateSession('update-note', undefined, trimmed);
-            lastSavedNoteRef.current = trimmed;
-            isNoteDirtyRef.current = false;
-          }
-        } catch (error) {
-          console.error('Error persisting note on close:', error);
-        }
-      }
-    }
+    await persistNote();
     // Clear validation errors
     setValidationError('');
     
