@@ -178,7 +178,6 @@ model Family {
   familyMembers  FamilyMember[]
   familySetups   FamilySetup[]
   feedback       Feedback[]
-  feedingSessions FeedingSession[]
 }
 
 // New model for family membership
@@ -225,7 +224,6 @@ model Baby {
   measurements Measurement[]
   events       BabyEvent[] // New relationship for calendar events
   medicineLogs MedicineLog[] // New relationship for medicine logs
-  feedingSessions FeedingSession[]
 
   @@index([birthDate])
   @@index([deletedAt])
@@ -269,7 +267,6 @@ model Caretaker {
   familyMembers FamilyMember[]
   familySetups  FamilySetup[]
   feedback      Feedback[]
-  feedingSessions FeedingSession[]
 
   @@index([deletedAt])
   @@index([familyId])
@@ -359,29 +356,6 @@ model FeedLog {
   @@index([unitAbbr])
   @@index([deletedAt])
   @@index([familyId])
-}
-
-model FeedingSession {
-  id         String    @id @default(uuid())
-  startedAt  DateTime
-  activeSide BreastSide?
-  status     String    @default("ACTIVE") // ACTIVE | PAUSED
-  note       String?
-  segments   Json
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  family   Family? @relation(fields: [familyId], references: [id])
-  familyId String?
-
-  baby        Baby       @relation(fields: [babyId], references: [id], onDelete: Cascade)
-  babyId      String
-  caretaker   Caretaker? @relation(fields: [caretakerId], references: [id])
-  caretakerId String?
-
-  @@index([babyId])
-  @@index([familyId])
-  @@index([status])
 }
 
 model DiaperLog {

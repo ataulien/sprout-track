@@ -1336,8 +1336,5 @@
   "Period": "Period",
   "Select hour": "Select hour",
   "Select minute": "Select minute",
-  "Select period": "Select period",
-  "Failed to save note": "Failed to save note",
-  "Start a feeding session before saving": "Start a feeding session before saving",
-  "An active feeding session already exists": "An active feeding session already exists"
+  "Select period": "Select period"
 }
