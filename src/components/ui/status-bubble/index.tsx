@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Moon, Sun, Icon } from 'lucide-react';
+import { Moon, Sun, Icon, Pill, Clock } from 'lucide-react';
 import { diaper, bottleBaby } from '@lucide/lab';
 import { cn } from "@/src/lib/utils";
 import { statusBubbleStyles as styles } from './status-bubble.styles';
@@ -38,11 +38,12 @@ export function StatusBubble({
         // Only calculate duration if this is the correct activity type
         // This ensures that "awake" status only considers sleep activities
         // and isn't affected by other activities like pumping
-        if (!activityType || 
-            (status === 'sleeping' && activityType === 'sleep') || 
+        if (!activityType ||
+            (status === 'sleeping' && activityType === 'sleep') ||
             (status === 'awake' && activityType === 'sleep') ||
             (status === 'feed' && activityType === 'feed') ||
-            (status === 'diaper' && activityType === 'diaper')) {
+            (status === 'diaper' && activityType === 'diaper') ||
+            (status === 'medicine' && activityType === 'medicine')) {
           const diffMinutes = calculateDurationMinutes(startTime, now.toISOString());
           setCalculatedDuration(diffMinutes);
         }
@@ -81,8 +82,11 @@ export function StatusBubble({
   // Use calculated duration if available, otherwise use prop
   const displayDuration = startTime ? calculatedDuration : durationInMinutes;
   
+  // Check if this is a countdown (negative duration - for medicine due time)
+  const isCountdown = startTime && calculatedDuration < 0;
+  
   // Check if duration exceeds warning time
-  const isWarning = warningTime && displayDuration >= getWarningMinutes(warningTime);
+  const isWarning = warningTime && !isCountdown && displayDuration >= getWarningMinutes(warningTime);
 
   // Get status-specific styles and icon
   const getStatusStyles = (): StatusStyle => {
@@ -107,6 +111,11 @@ export function StatusBubble({
           bgColor: isWarning ? styles.statusStyles.diaper.warning : styles.statusStyles.diaper.normal,
           icon: <Icon iconNode={diaper} className={styles.icon} />
         };
+      case 'medicine':
+        return {
+          bgColor: isWarning ? styles.statusStyles.medicine.warning : styles.statusStyles.medicine.normal,
+          icon: <Pill className={styles.icon} />
+        };
       default:
         return {
           bgColor: styles.statusStyles.default.bgColor,
@@ -116,6 +125,9 @@ export function StatusBubble({
   };
 
   const { bgColor, icon } = getStatusStyles();
+  
+  // Show clock icon for countdown (medicine due soon)
+  const displayIcon = isCountdown ? <Clock className={styles.icon} /> : icon;
 
   return (
     <div
@@ -125,8 +137,10 @@ export function StatusBubble({
         className
       )}
     >
-      {icon}
-      <span>{formatDuration(displayDuration * 60000)}</span>
+      {displayIcon}
+      <span>{isCountdown ? 'in ' + formatDuration(-displayDuration * 60000) : formatDuration(displayDuration * 60000)}</span>
     </div>
   );
 }
+
+

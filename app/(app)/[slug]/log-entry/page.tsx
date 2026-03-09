@@ -52,6 +52,7 @@ function HomeContent(): React.ReactElement {
   const [lastSleepEndTime, setLastSleepEndTime] = useState<Record<string, Date>>({});
   const [lastFeedTime, setLastFeedTime] = useState<Record<string, Date>>({});
   const [lastDiaperTime, setLastDiaperTime] = useState<Record<string, Date>>({});
+  const [earliestMedicineDueTime, setEarliestMedicineDueTime] = useState<Record<string, Date>>({});
 
   // Track the currently selected date in the Timeline component
   const [selectedTimelineDate, setSelectedTimelineDate] = useState<Date | null>(null);
@@ -220,6 +221,74 @@ function HomeContent(): React.ReactElement {
           }));
         }
         
+        // Calculate earliest medicine due time
+        // Group medicine logs by medicine and find the earliest time when a dose becomes due
+        const medicineLogs = timelineData.data.filter((activity: any) =>
+          'doseAmount' in activity && 'medicine' in activity && activity.medicine
+        );
+        
+        if (medicineLogs.length > 0) {
+          // Group by medicine
+          const medicineGroups = medicineLogs.reduce((groups: any, log: any) => {
+            const medicineId = log.medicine.id;
+            if (!groups[medicineId]) groups[medicineId] = [];
+            groups[medicineId].push(log);
+            return groups;
+          }, {});
+          
+          const now = new Date();
+          let earliestDueTime: Date | null = null;
+          
+          // For each medicine, find when the next dose becomes due
+          Object.values(medicineGroups).forEach((logs: any) => {
+            // Sort by time, most recent first
+            logs.sort((a: any, b: any) => new Date(b.time).getTime() - new Date(a.time).getTime());
+            
+            const latestLog = logs[0];
+            const medicine = latestLog.medicine;
+            const doseMinTime = medicine.doseMinTime;
+            
+            if (!doseMinTime) return;
+            
+            // Parse doseMinTime (supports DD:HH:MM or HH:MM format)
+            const timeRegex = /^([0-9]{1,2}):([0-1][0-9]|2[0-3]):([0-5][0-9])$/;
+            let minTimeMs = 0;
+            
+            if (timeRegex.test(doseMinTime)) {
+              const [days, hours, minutes] = doseMinTime.split(':').map(Number);
+              minTimeMs = ((days * 24 * 60) + (hours * 60) + minutes) * 60 * 1000;
+            } else {
+              // Try old HH:MM format
+              const oldTimeRegex = /^([0-1][0-9]|2[0-3]):([0-5][0-9])$/;
+              if (oldTimeRegex.test(doseMinTime)) {
+                const [hours, minutes] = doseMinTime.split(':').map(Number);
+                minTimeMs = (hours * 60 + minutes) * 60 * 1000;
+              }
+            }
+            
+            if (minTimeMs > 0) {
+              const lastDoseTime = new Date(latestLog.time).getTime();
+              const dueTime = new Date(lastDoseTime + minTimeMs);
+              
+              // If the dose is due within the next hour, track it for early warning
+              const oneHourInMs = 60 * 60 * 1000;
+              if (dueTime.getTime() <= now.getTime() + oneHourInMs) {
+                if (!earliestDueTime || dueTime.getTime() < earliestDueTime.getTime()) {
+                  earliestDueTime = dueTime;
+                }
+              }
+            }
+          });
+          
+          if (earliestDueTime) {
+            const dueTime = earliestDueTime as Date;
+            setEarliestMedicineDueTime(prev => ({
+              ...prev,
+              [babyId]: dueTime
+            }));
+          }
+        }
+        
         // Update refresh timestamp for polling mechanism
         lastRefreshTimestamp.current = Date.now();
       }
@@ -366,6 +435,7 @@ function HomeContent(): React.ReactElement {
           lastSleepEndTime={lastSleepEndTime}
           lastFeedTime={lastFeedTime}
           lastDiaperTime={lastDiaperTime}
+          earliestMedicineDueTime={earliestMedicineDueTime}
           updateUnlockTimer={updateUnlockTimer}
           onSleepClick={() => setShowSleepModal(true)}
           onFeedClick={() => setShowFeedModal(true)}

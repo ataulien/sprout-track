@@ -24,6 +24,7 @@ interface ActivityTileGroupProps {
   lastSleepEndTime: Record<string, Date>;
   lastFeedTime: Record<string, Date>;
   lastDiaperTime: Record<string, Date>;
+  earliestMedicineDueTime: Record<string, Date>;
   updateUnlockTimer: () => void;
   onSleepClick: () => void;
   onFeedClick: () => void;
@@ -52,6 +53,7 @@ export function ActivityTileGroup({
   lastSleepEndTime,
   lastFeedTime,
   lastDiaperTime,
+  earliestMedicineDueTime,
   updateUnlockTimer,
   onSleepClick,
   onFeedClick,
@@ -685,6 +687,16 @@ export function ActivityTileGroup({
                 onMedicineClick();
               }}
             />
+            {selectedBaby?.id && earliestMedicineDueTime[selectedBaby.id] && !exceeds24Hours(earliestMedicineDueTime[selectedBaby.id]) && (
+              <StatusBubble
+                status="medicine"
+                className="overflow-visible z-40"
+                durationInMinutes={0}
+                startTime={earliestMedicineDueTime[selectedBaby.id].toISOString()}
+                activityType="medicine"
+                warningTime="00:00"
+              />
+            )}
           </div>
         );
       default:
