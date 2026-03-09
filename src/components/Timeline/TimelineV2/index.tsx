@@ -1,5 +1,6 @@
 import { Settings } from '@prisma/client';
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { TimeFormat } from '@/src/lib/date-time';
 import SleepForm from '@/src/components/forms/SleepForm';
 import FeedForm from '@/src/components/forms/FeedForm';
 import DiaperForm from '@/src/components/forms/DiaperForm';
@@ -320,6 +321,7 @@ const TimelineV2 = ({ activities, onActivityDeleted }: TimelineProps) => {
         onFilterChange={handleFilterChange}
         isHeatmapVisible={isHeatmapVisible}
         onHeatmapToggle={() => setIsHeatmapVisible((prev) => !prev)}
+        timeFormat={(settings?.timeFormat as TimeFormat) ?? '24h'}
       />
 
       {/* Activity List + Right-side Heatmap */}
@@ -342,6 +344,7 @@ const TimelineV2 = ({ activities, onActivityDeleted }: TimelineProps) => {
               activities={heatmapActivities}
               selectedDate={selectedDate}
               isVisible={isHeatmapVisible}
+              timeFormat={(settings?.timeFormat as TimeFormat) ?? '24h'}
             />
           </div>
         )}

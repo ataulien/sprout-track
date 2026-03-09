@@ -29,6 +29,7 @@ import { ActivityType } from '../types';
 import TimelineV2Heatmap from './TimelineV2Heatmap';
 import { useLocalization } from '@/src/context/localization';
 import { useTimezone } from '@/app/context/timezone';
+import { TimeFormat } from '@/src/lib/date-time';
 
 import './TimelineV2DailyStats.css';
 
@@ -43,6 +44,7 @@ interface TimelineV2DailyStatsProps {
   onFilterChange: (filter: FilterType) => void;
    isHeatmapVisible: boolean;
    onHeatmapToggle: () => void;
+   timeFormat?: TimeFormat;
 }
 
 interface StatTile {
@@ -66,7 +68,8 @@ const TimelineV2DailyStats: React.FC<TimelineV2DailyStatsProps> = ({
   onDateSelection,
   onFilterChange,
   isHeatmapVisible,
-  onHeatmapToggle
+  onHeatmapToggle,
+  timeFormat = '24h'
 }) => {
   const { t } = useLocalization();
   const { formatDateOnly } = useTimezone();
@@ -722,6 +725,7 @@ const TimelineV2DailyStats: React.FC<TimelineV2DailyStatsProps> = ({
               activities={heatmapActivities}
               selectedDate={date}
               isVisible={isHeatmapVisible}
+              timeFormat={timeFormat}
             />
           </div>
         </div>

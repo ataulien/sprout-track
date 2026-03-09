@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Grid3X3, Loader2, Moon, Sun, BedDouble, Baby } from 'lucide-react';
 import { Icon } from 'lucide-react';
 import { diaper, bottleBaby } from '@lucide/lab';
@@ -10,6 +10,7 @@ import { styles } from './reports.styles';
 import { HeatmapsTabProps, ActivityType, SleepActivity, FeedActivity, DiaperActivity, PumpActivity } from './reports.types';
 import { getActivityTime } from '@/src/components/Timeline/utils';
 import { useLocalization } from '@/src/context/localization';
+import { getDateTimePreferences, TimeFormat } from '@/src/lib/date-time';
 
 import {
   TIME_SLOTS,
@@ -18,6 +19,7 @@ import {
   getSlotOpacity,
   interpolateColor,
   buildHeatmapDataForActivities,
+  formatHourLabel,
 } from '@/src/components/Timeline/TimelineV2/timeline-heatmap.utils';
 const CHART_HEIGHT = 1500;
 
@@ -40,14 +42,6 @@ const HEATMAP_CONFIGS: HeatmapConfig[] = [
   { id: 'pumps', title: 'Pumps', icon: <LampWallDown className="h-4 w-4" />, description: 'Breast pump timing patterns' },
 ];
 
-// Format hour for chart labels (6a, 7a, 12p, 1p, etc.)
-const formatHourLabel = (hour: number): string => {
-  if (hour === 0 || hour === 24) return '12a';
-  if (hour === 12) return '12p';
-  if (hour < 12) return `${hour}a`;
-  return `${hour - 12}p`;
-};
-
 // Convert time to slot index
 const timeToSlot = (hours: number): number => {
   const slot = Math.floor((hours * 60) / SLOT_MINUTES);
@@ -60,6 +54,30 @@ const HeatmapsTab: React.FC<HeatmapsTabProps> = ({
   isLoading
 }) => {
   const { t } = useLocalization();
+  const [timeFormat, setTimeFormat] = useState<TimeFormat>('24h');
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+        const response = await fetch('/api/settings', {
+          headers: { 'Authorization': authToken ? `Bearer ${authToken}` : '' },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            const prefs = getDateTimePreferences({
+              timeFormat: data.data?.timeFormat as TimeFormat | undefined,
+            });
+            setTimeFormat(prefs.timeFormat);
+          }
+        }
+      } catch {
+        // Non-fatal
+      }
+    };
+    fetchSettings();
+  }, []);
   // Calculate heatmap data for each type
   const heatmapData = useMemo(() => {
     if (!activities.length || !dateRange.from || !dateRange.to) {
@@ -177,7 +195,7 @@ const HeatmapsTab: React.FC<HeatmapsTabProps> = ({
                                 transform: 'translateY(-50%)',
                               }}
                             >
-                              {formatHourLabel(hour)}
+                              {formatHourLabel(hour, timeFormat)}
                             </span>
                           )}
                         </div>

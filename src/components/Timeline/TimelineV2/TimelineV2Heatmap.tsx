@@ -1,5 +1,6 @@
 import React, { useMemo, useEffect, useRef, useState } from 'react';
 import { ActivityType } from '../types';
+import { TimeFormat } from '@/src/lib/date-time';
 import {
   TIME_SLOTS,
   SLOT_MINUTES,
@@ -8,30 +9,25 @@ import {
   buildHeatmapDataForActivities,
   getSlotOpacity,
   interpolateColor,
+  formatHourLabel,
 } from './timeline-heatmap.utils';
 
 interface TimelineV2HeatmapProps {
   activities: ActivityType[];
   selectedDate: Date;
   isVisible?: boolean;
+  timeFormat?: TimeFormat;
 }
 
 const CHART_HEIGHT = 1500;
 const LANE_WIDTH = 8; // each heatmap type lane
 const LANE_GAP = 2;
 
-// Format hour for labels (reuses pattern from Reports)
-const formatHourLabel = (hour: number): string => {
-  if (hour === 0 || hour === 24) return '12a';
-  if (hour === 12) return '12p';
-  if (hour < 12) return `${hour}a`;
-  return `${hour - 12}p`;
-};
-
 const TimelineV2Heatmap: React.FC<TimelineV2HeatmapProps> = ({
   activities,
   selectedDate,
   isVisible = true,
+  timeFormat = '24h',
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -147,7 +143,7 @@ const TimelineV2Heatmap: React.FC<TimelineV2HeatmapProps> = ({
                       transform: 'translateY(-50%)',
                     }}
                   >
-                    {formatHourLabel(hour)}
+                    {formatHourLabel(hour, timeFormat)}
                   </span>
                 )}
               </div>

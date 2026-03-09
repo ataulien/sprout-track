@@ -1,4 +1,5 @@
 import { ActivityType } from '../types';
+import { TimeFormat } from '@/src/lib/date-time';
 
 // Shared heatmap configuration
 export const TIME_SLOTS = 288; // 5-minute slots
@@ -77,6 +78,18 @@ export const timeToSlot = (hours: number): number => {
 };
 
 const getHours = (d: Date) => d.getHours() + d.getMinutes() / 60;
+
+// Format hour for heatmap axis labels
+export const formatHourLabel = (hour: number, timeFormat: TimeFormat = '24h'): string => {
+  const h = hour % 24;
+  if (timeFormat === '12h') {
+    if (h === 0) return '12a';
+    if (h === 12) return '12p';
+    if (h < 12) return `${h}a`;
+    return `${h - 12}p`;
+  }
+  return `${h}:00`;
+};
 
 export interface HeatmapSeriesData {
   slots: number[];
